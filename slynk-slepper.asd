@@ -7,8 +7,7 @@
                #:eclector-concrete-syntax-tree
                #:trivial-macroexpand-all)
   :description "SLEPPER support for Slynk"
-  :components ((:file "slepper")
-               (:file "slynk-slepper")))
+  :components ((:file "slynk-slepper")))
 
 ;; Local Variables:
 ;; coding: utf-8

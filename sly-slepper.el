@@ -38,21 +38,25 @@ in `sly-editing-mode-hook', i.e. lisp files."
   (:on-load (add-hook 'sly-editing-mode-hook 'sly-slepper-mode))
   (:on-unload (remove-hook 'sly-editing-mode-hook 'sly-slepper-mode)))
 
+(defun sly-slepper--sticker-maybe (from to)
+  (unless (sly-stickers--stickers-exactly-at from to)
+    (sly-stickers--sticker from to)))
+
 (defun sly-slepper (pos)
   "Slepp defun at point POS.  POS defaults to curren point."
   (interactive "d")
-  (let ((source (cl-destructuring-bind (a b)
-                    (sly-region-for-defun-at-point pos)
-                  (buffer-substring-no-properties a b))))
-    (with-current-buffer (get-buffer-create
-                          (generate-new-buffer-name "*slepper*"))
-      (erase-buffer)
-      (cl-loop
-       with standard-output = (current-buffer)
-       for res in
-       (sly-eval `(slynk-slepper:slepper ,source))
-       do (pp res))
-      (pop-to-buffer (current-buffer))))
+  (cl-destructuring-bind (beg end)
+      (sly-region-for-defun-at-point pos)
+    (cl-loop for result in (sly-eval
+                            `(slynk-slepper:slepper
+                              ,(buffer-substring-no-properties
+                                beg
+                                end)))
+             for (a . b) = (cl-getf result :source)
+             do (save-excursion
+                  (sly-slepper--sticker-maybe
+                   (+ beg a)
+                   (+ beg b)))))
   (message "Done"))
 
 (define-minor-mode sly-slepper-mode
@@ -64,10 +68,10 @@ in `sly-editing-mode-hook', i.e. lisp files."
          )))
 
 (defvar sly-slepper-map
-  "A keymap accompanying `sly-slepper-mode'."
   (let ((map (make-sparse-keymap)))
-    (define-key sly-prefix-map (kbd "C-c C-w") 'sly-slepper)
-    map))
+    (define-key map (kbd "C-c C-w") 'sly-slepper)
+    map)
+  "A keymap accompanying `sly-slepper-mode'.")
 
 ;;; Automatically add ourselves to `sly-contribs' when this file is loaded
 ;;;###autoload
