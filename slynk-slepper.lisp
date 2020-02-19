@@ -13,29 +13,45 @@
     (when (cst:consp cst)
       (maptree fn (cst:first cst))
       (maptree fn (cst:rest cst))))
-  (:method (fn (tree cons))
+  (:method (fn tree)
     (funcall fn tree)
     (when (consp tree)
       (maptree fn (car tree))
       (maptree fn (cdr tree)))))
 
-(defgeneric read-tracking-source (stream)
-  (:documentation
-   "Like CL:READ, but return a source-tracking information as a second value.
+(defparameter *use-eclector* nil)
+
+(defun read-tracking-source (stream)
+  "Like CL:READ, but return a source-tracking information as a second value.
 The second value can be passed to RECONSTRUCT or
-FORM-SOURCE-LOCATION.")
-  (:method (stream)
-    (let ((cst (eclector.concrete-syntax-tree:read stream)))
-      (values (cst:raw cst)
-              cst))))
+FORM-SOURCE-LOCATION."
+  (if *use-eclector*
+      (let ((cst (eclector.concrete-syntax-tree:read stream)))
+        (values (cst:raw cst)
+                cst))
+      (let ((ht (make-hash-table)))
+        (values
+         (source-tracking-reader:read-tracking-source
+          stream nil nil nil
+          (lambda (form pos)
+            (setf (gethash form ht) pos)))
+         ht))))
+
+
 
 (defgeneric reconstruct (untracked-expansion
                          source-tracking-info)
   (:documentation
    "Compute tree mirroring UNTRACKED-EXPANSION, but as tracked as possible.
-The resulting tree may or may not reuse CONSes and atoms from
-UNTRACKED-EXPANSION.  Inside it, as many CONSes and ATOM as possible
-shall respond to FORM-SOURCE-LOCATION.")
+
+Return two values.  The resulting CONS tree is returned as the first
+value and may or may not reuse CONSes and atoms from
+UNTRACKED-EXPANSION.  As a second value return updated source-tracking
+information.
+
+Inside the resulting, as many CONSes and ATOM as possible shall
+respond to FORM-SOURCE-LOCATION when that function is also passed the
+updated source-tracking information.")
   (:method ((untracked-expansion cons) (source-tracking-info cst:cst))
     (let ((retval (concrete-syntax-tree:reconstruct
                    untracked-expansion
@@ -52,7 +68,9 @@ shall respond to FORM-SOURCE-LOCATION.")
                 (when (eq (cst:raw cst) form)
                   (return-from form-source-location
                     (cst:source cst))))
-              cst)))
+              cst))
+  (:method (form (source-tracking-info hash-table))
+    (gethash form source-tracking-info)))
 
 (defun collect-interesting-forms (reconstructed source-tracking-info)
   (let (interesting)
@@ -184,8 +202,7 @@ shall respond to FORM-SOURCE-LOCATION.")
              (mapcar (lambda (form)
                        (let ((src (form-source-location form source-tracking-info)))
                          (assert src nil "~a doesn't have any source-tracking information attached")
-                         (list :form form :source src))
-                       (report-form form source-tracking-info))
+                         (list :form form :source src)))
                      interesting)
              interesting
              reconstructed)))))))

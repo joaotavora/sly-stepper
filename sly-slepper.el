@@ -69,7 +69,7 @@ in `sly-editing-mode-hook', i.e. lisp files."
 
 (defvar sly-slepper-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-w") 'sly-slepper)
+    (define-key map (kbd "C-c C-s P") 'sly-slepper)
     map)
   "A keymap accompanying `sly-slepper-mode'.")
 
