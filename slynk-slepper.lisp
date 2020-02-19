@@ -19,14 +19,6 @@
       (maptree fn (car tree))
       (maptree fn (cdr tree)))))
 
-(defgeneric report-form (source-tracked-form)
-  (:documentation
-   "Report SOURCE-TRACKED-FORM to Emacs as a plist.")
-  (:method ((cst cst:cst))
-    (let ((src (cst:source cst)))
-      (assert src nil "~a doesn't have any source-tracking information attached")
-      (list :form (cst:raw cst) :source src))))
-
 (defgeneric read-tracking-source (stream)
   (:documentation
    "Like CL:READ, but return a source-tracking information as a second value.
@@ -168,7 +160,8 @@ shall respond to FORM-SOURCE-LOCATION.")
                   (assert (symbolp op) nil "Suprised by ~a" form)
                   (when (fboundp op)
                     (mapc #'explore (rest form)))))))))
-      (explore reconstructed))))
+      (explore reconstructed)
+      interesting)))
 
 ;; Algorithm
 
@@ -188,7 +181,12 @@ shall respond to FORM-SOURCE-LOCATION.")
                   (collect-interesting-forms reconstructed
                                              source-tracking-info)))
             (values
-             (mapcar #'report-form interesting)
+             (mapcar (lambda (form)
+                       (let ((src (form-source-location form source-tracking-info)))
+                         (assert src nil "~a doesn't have any source-tracking information attached")
+                         (list :form form :source src))
+                       (report-form form source-tracking-info))
+                     interesting)
              interesting
              reconstructed)))))))
 
