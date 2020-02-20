@@ -37,8 +37,6 @@ FORM-SOURCE-LOCATION."
             (setf (gethash form ht) pos)))
          ht))))
 
-
-
 (defgeneric reconstruct (untracked-expansion
                          source-tracking-info)
   (:documentation
@@ -58,7 +56,27 @@ updated source-tracking information.")
                    source-tracking-info
                    nil)))
       (values (cst:raw retval)
-              retval))))
+              retval)))
+  (:method ((untracked-expansion cons) (source-tracking-info hash-table))
+    ;; naive
+    (values untracked-expansion source-tracking-info)
+    (let ((new-ht (make-hash-table)))
+      (labels ((traverse (form)
+                 (let* ((mirror
+                          (cond ((consp form)
+                                 (cons
+                                  (traverse (car form))
+                                  (traverse (cdr form))))
+                                (t
+                                 form)))
+                        (source (gethash form source-tracking-info)))
+                   (when source
+                     (setf (gethash mirror new-ht) source))
+                   mirror)))
+        (values (traverse untracked-expansion)
+                new-ht
+                untracked-expansion
+                source-tracking-info)))))
 
 (defgeneric form-source-location (form source-tracking-info)
   (:documentation
@@ -87,9 +105,9 @@ updated source-tracking information.")
            (destructuring-bind (name arglist &rest body)
                definition
              (declare (ignore name arglist))
-             (mapc #'explore (butdeclares (butdoc body)))))
+             (explore-body body)))
          (explore-body (forms)
-           (mapc #'explore (butdeclares forms)))
+           (mapc #'explore (butdeclares (butdoc forms))))
          (explore (form)
            (format *trace-output* "Exploring ~a~%" form)
            (when (form-source-location form source-tracking-info)
@@ -164,6 +182,17 @@ updated source-tracking information.")
                 (explore-body body))
                ((quote thing)
                 (declare (ignore thing)))
+               ;;; Quirks section
+               ;;
+               ;; * lambda is a macro that expands to (function (lambda
+               ;; ...)) but TRIVIAL-MACROEXPAND-ALL:MACROEXPAND-ALL
+               ;; doesn't see it like that and keeps it unexpanded.
+               ((lambda arglist &rest body)
+                (declare (ignore arglist))
+                (explore-body body))
+               ;; * DEFUN will often expand to implementation-defined
+               ;;   macros that can't be expanded by macroexpand.
+               ;;
                #+sbcl
                ((sb-int:named-lambda &rest definition)
                 (explore-definition definition))
@@ -176,8 +205,7 @@ updated source-tracking information.")
                (t
                 (let ((op (first form)))
                   (assert (symbolp op) nil "Suprised by ~a" form)
-                  (when (fboundp op)
-                    (mapc #'explore (rest form)))))))))
+                  (mapc #'explore (rest form))))))))
       (explore reconstructed)
       interesting)))
 

@@ -24,3 +24,24 @@
                (force-output)
                t)))))
 
+
+;; problem! the atom HMM gets incorrectly stickered
+(lambda ()
+  (let ((hmm (progn
+               (if thingy
+                   foo
+                   bar))))
+    hmm
+    aha))
+
+(format t
+        (restart-case
+            (error "bla")
+          (foo ()
+            :test shiiz)))
+
+(lambda () (if (foo) (bar) (shod))) ;; OK
+
+(lambda () (if (foo) (bar) (quux (quuz (quuf))))) ;; OK
+
+
