@@ -53,6 +53,7 @@ in `sly-editing-mode-hook', i.e. lisp files."
                                 beg
                                 end)))
              for (a . b) = (cl-getf result :source)
+             unless (zerop a)
              do (save-excursion
                   (sly-slepper--sticker-maybe
                    (+ beg a)
