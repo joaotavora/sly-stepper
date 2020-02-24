@@ -30,7 +30,7 @@
   (and (< (car a) (car b)) (> (cdr a) (cdr b))))
 
 (defun forms-of-interest (expanded ht-2)
-  (let (interesting)
+  (let ((interesting (make-hash-table)))
     (labels
         ((butdoc (forms)
            (member-if-not #'stringp forms))
@@ -46,6 +46,11 @@
              (explore-body body)))
          (explore-body (forms)
            (mapc #'explore (butdeclares (butdoc forms))))
+         (collect (form original loc)
+           (setf (gethash loc interesting)
+                 (list :form form
+                       :original original
+                       :source loc)))
          (maybe-explore-atom (form safe-range)
            "Deem FORM's manifestations interesting if within SAFE-RANGE."
            (when (and (atom form)
@@ -56,21 +61,14 @@
                    with original = (getf entry :original)
                    for loc in (getf entry :at)
                    when (containsp safe-range loc)
-                     do (push (list :form form
-                                    :original original
-                                    :source loc)
-                              interesting))))
+                     do (collect form original loc))))
          (explore (form)
            "Called when FORM is deemed interesting."
            (format *trace-output* "Exploring ~a~%" form)
            (when (consp form)
              (let* ((entry (gethash form ht-2))
                     (loc (first (getf entry :at))))
-               (when loc
-                 (push (list :form form
-                             :original (getf entry :original)
-                             :source loc)
-                       interesting))
+               (when loc (collect form (getf entry :original) loc))
                (slynk-api:destructure-case
                    form
                  ((block name &rest body)
@@ -178,7 +176,12 @@
                           when loc do (maybe-explore-atom f loc)
                           do (explore f)))))))))
       (explore expanded)
-      interesting)))
+      (let (retval)
+        (maphash (lambda (k v)
+                   (declare (ignore k))
+                   (push v retval))
+                 interesting)
+        retval))))
 
 ;; Entry point
 (defslyfun slepper (&optional (string "(loop for x from 1 repeat 10 collect x)"))
