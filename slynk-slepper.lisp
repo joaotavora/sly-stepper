@@ -20,15 +20,10 @@
       :on-every-form
       (lambda (expansion env)
         (declare (ignore env))
-        (destructuring-bind (&key original ((:at locations)))
-            (pop stack)
-          (setf (gethash expansion expansion-positions)
-                (list :original original
-                      :at locations)))
+        (setf (gethash expansion expansion-positions)
+              (pop stack))
         expansion))
      expansion-positions)))
-
-(defvar *compound-form-location*)
 
 (defun containsp (a b)
   "True iff A contains B."
@@ -51,7 +46,8 @@
              (explore-body body)))
          (explore-body (forms)
            (mapc #'explore (butdeclares (butdoc forms))))
-         (maybe-explore-atom (form)
+         (maybe-explore-atom (form safe-range)
+           "Deem FORM's manifestations interesting if within SAFE-RANGE."
            (when (and (atom form)
                       form
                       (not (stringp form))
@@ -59,8 +55,7 @@
              (loop with entry = (gethash form ht-2)
                    with original = (getf entry :original)
                    for loc in (getf entry :at)
-                   when (and *compound-form-location*
-                             (containsp *compound-form-location* loc))
+                   when (containsp safe-range loc)
                      do (push (list :form form
                                     :original original
                                     :source loc)
@@ -179,9 +174,9 @@
                  (t
                   (let ((op (first form)))
                     (assert (symbolp op) nil "Suprised by ~a" form)
-                    (let ((*compound-form-location* loc))
-                      (mapc #'maybe-explore-atom (rest form)))
-                    (mapc #'explore (rest form)))))))))
+                    (loop for f in (rest form)
+                          when loc do (maybe-explore-atom f loc)
+                          do (explore f)))))))))
       (explore expanded)
       interesting)))
 
