@@ -704,6 +704,10 @@ for instrumentation through stickers as described in section
 
 \section{Results and further work}\label{results}
 
+We have released the result of our work on the GitHub
+platform\footnote{See
+  \texttt{git@github.com:joaotavora/sly-slepper.git}.}.
+
 From an end user's perspective, to put the new SLY/Emacs stepper to
 work means pressing the key chord \texttt{C-c C-s P} (\emph{control-c,
   control-s, capital P}) while the cursor is on a top-level form.
@@ -711,24 +715,26 @@ This causes the interesting sub-forms of that top-level form to be
 automatically decorated with sticker \emph{overlays}, which by default
 uses different shades of the color gray.  As described in
 \ref{stickers}, a posterior compilation of that same top-level form
-shall \emph{arm} the stickers and convert the overlay's color into
-shades of blue.  From this point the stickers are executed as soon as
-the user arranges for the instrumented code to be run as usual.
+shall \emph{arm} the stickers and convert the overlays' color to
+shades of blue.  From this point on, the stickers are executed as soon
+as the user arranges for the instrumented code to be run as usual.
 
-Note that the default behavior of the underlying sticker system
-doesn't equate the execution of an instrumented form to an invocation
-of the Lisp debugger.  This is by design.  As was explained in section
-\ref{stickers}, in the default configuration, executions of the
-instrumented form merely record the its return values for later
-replay, which can be achieved with the key chord \texttt{C-c C-s C-r}.
-Alternatively, the key chord \texttt{C-c C-s S} can be used to fetch
-the most recent recordings for each sticker and visually decorate the
-source code, indicating (1) stickers that have been executed; (2)
-those that haven't yet, and (3) those that have exited non-locally.
+Note that the default behavior of the sticker system doesn't equate
+the execution of an instrumented form to a break point, i.e. the
+invocation of the Lisp debugger.  This is by design.  As was explained
+in section \ref{stickers}, the default behavior is to have sticker
+executions merely record the return values (or non-local exits) for
+later replay.  This which can be achieved with the key chord
+\texttt{C-c C-s C-r} or via \texttt{M-x sly-stickers-replay}.
+Alternatively, the key chord \texttt{C-c C-s S} (or \texttt{M-x
+  sly-stickers-fetch}) can be used to fetch the most recent recordings
+for each sticker and visually decorate the source code, indicating (1)
+stickers that have been executed; (2) those that haven't yet, and (3)
+those that have exited non-locally.
 
-Finally to enable the classic stepper functionality, the user must
+Finally, to enable the classic stepper functionality, the user must
 explicitly select ``breaking stickers'' by affecting the value of the
-\texttt{SLYNK-STICKERS:*BREAK-ON-STICKERS*} variable. 
+\texttt{SLYNK-STICKERS:*BREAK-ON-STICKERS*} variable.
 
 We shall see as we discuss its limitations that the resulting
 SLY/Emacs stepper tool is still in its infancy.  It can nevertheless
@@ -739,17 +745,17 @@ stickers.
 
 \subsection{Limitations concerning atoms}\label{atoms}
 
-In section \ref{collecting-interesting-forms} we sidestepped a
+In section \ref{collecting-interesting-forms}, we sidestepped a
 notorious difficulty with atomic forms, i.e. one-symbol symbolic
-expressions.  In fact, this class of difficulties is already alluded
-to in \cite[I-4.8]{annotation-based}.  The problem can be observed
-with the simplest of forms:
+expressions.  This class of difficulties is already alluded to in
+\cite[I-4.8]{annotation-based}.  The problem with atoms can be
+observed with the simplest of forms:
 
 \begin{verbatim}
 (lambda (x) x)
 \end{verbatim}
 
-In this example, we note that atom \texttt{X} has two different
+In this example, we note that the atom \texttt{X} has two different
 \emph{manifestations} in the encompassing form.  Naturally one wants
 only the latter to be annotated, and not the first.  However, this is
 hard to determine reliably since both are represented by the very same
@@ -762,22 +768,31 @@ that's not enough to know in \texttt{MNESIC-MACROEXPAND-ALL} which of
 those is a in a position of execution.  This is because the
 \texttt{AGNOSTIC-LIZARD} macroexpander will only traverse sub-forms of
 forms actually returned by a macro's expansion.  In this example, our
-hook is only called on the \texttt{(lambda (x) x)} and \texttt{x} forms,
-\emph{not} on the \texttt{(x)} form, thus there is no easy way to
-invalidate the first manifestation.
+hook is only called on the \texttt{(lambda (x) x)} and \texttt{x}
+forms, \emph{not} on the \texttt{(x)} form.  The latter form is merely
+an argument to the macro itself where we have no power of
+intervention, and thus there is no easy way to invalidate the first
+manifestation.
 
 However, since we \emph{do} know that \texttt{x} is manifested at
 \texttt{(9 . 10)} and \texttt{(12 . 13)} it is possible to devise
 heuristics to trace back to the knowledge gathered when first reading
 the form and traverse the atom's parent forms, given only the atom.  A
-simple heuristic can proceed like this: if the atom exists inside a
-compound form that does not occur in the final expansion, then that
+very simple heuristic can proceed like this: if the atom exists inside
+a compound form that does not occur in the final expansion, then that
 atom isn't interesting, otherwise, it is.  This appears to solve the
 above situation but fails miserably in the presence of the
 \texttt{LOOP} macro since this macro has all the variable definition
-``unprotected'' by parenthesis.  Hard-wiring exceptions to
-\texttt{LOOP} and other macros could ameliorate the situation, but
-overall this strategy feels murky and insufficient.
+``unprotected'' by parenthesis.
+
+Hard-wiring exceptions to \texttt{LOOP} and other macros could
+ameliorate the situation, but overall this strategy feels murky and
+insufficient.  On the other hand, if more aggressive strategies of
+atomic annotation are attempted, the SLY/Emacs sticker system has
+already shown to be reliable in the sense that if it needs to fail
+(because of an incorrect form being annotated), it will mostly do so
+early.  Thus the potential to mislead users to wrong debugging
+conclusions is minimized.
 
 A better approach to solve this problem could revisit
 \texttt{Eclector}'s ``concrete syntax trees'' or a variation thereof
@@ -786,16 +801,11 @@ these types of trees, where different manifestations of the same
 atomic form are represented by different objects.
 
 For now, the proposed SLY/Emacs's stepper works around this limitation
-by behaving conservatively and only annotating atoms is positions that
-are guaranteedly safe, such as in function calls, which makes for the
-majority of situations in practice.  Furthermore, users can always
-manually add stickers to other atom manifestations they are interested
-in and know to also be safe.
-
-On the other hand, if more ambitious strategies of annotation are
-attempted, the SLY/Emacs sticker system has already shown to be
-reliable in the sense that if it needs to fail, it will do so early,
-and thus won't mislead users to wrong debugging conclusions.
+by behaving conservatively and only annotating atoms in positions that
+are guaranteed to be safe, such as inside function call forms.  This
+makes for the majority of situations in practice.  Furthermore, users
+can always manually add stickers to other atom manifestations they are
+interested in and know to also be safe.
 
 \subsection{Interface limitations}
 
@@ -830,21 +840,22 @@ program stepping is just another tool in the toolbox, and not way a
 panacea.
 
 By the same token, if one does implement such a tool, it should be
-done in a manner that is of actual practical use.  This was the
-thinking behind the SLY/Emacs stepper's annotation-based approach.  We
-think it especially fortuitous that the manner of source-code
-correlation in SLY/Emacs's stickers feature doesn't make use of direct
-references to source files or file positions, As was shown in
-\ref{stickers}, it merely keeps an enumerated list of stickers
-identifiers synchronized between Common Lisp and SLY/Emacs.  This
-mechanism is simple but effective, and adequately resists some
+done in a manner that is of actual, practical use.  This was the
+thinking behind the SLY/Emacs stepper.  We think it especially
+fortuitous that annotation-based approach and the manner of
+source-code correlation in SLY/Emacs's stickers feature doesn't make
+use of direct references to source files or file positions.  As was
+shown in \ref{stickers}, we merely keep an enumerated list of stickers
+identifiers synchronized between Common Lisp and SLY/Emacs, a
+mechanism that is simple but effective.  It adequately resists some
 modifications to the source of the instrumented form or its
-whereabouts, such as moving it around in the source file, or adding
-white-space and comments.  This detail is crucial in making stickers
-and stepping actually usable for day-to-day programming, since the
-user isn't dragged away from his editor.  These very advantages of
-annotation-based steppers were already hinted at back in 1989 by the
-proponents of evaluation-based steppers\cite[l.41,
+whereabouts, such as moving it around in the source file, or even
+adding white-space and comments inside it.  This detail is crucial in
+making stickers and stepping actually usable for day-to-day
+programming, since the user isn't dragged away from his editor or
+forced to a special confinement while stepping.  We note that these
+advantages of annotation-based steppers were already hinted at back in
+1989 by the proponents of evaluation-based steppers\cite[l.41,
 l.42]{evaluation-based}.
 
 By contrast, an hypothetical evaluation-based visual stepper (such an
@@ -874,7 +885,7 @@ advantage: since the annotations are stickers, users can manually
 adjust the automatically placed stickers, removing the ones they are
 not interested in, or adding others.
 
-It may be also be noted that the usual stepping paradigm where the
+It may also be noted that the usual stepping paradigm where the
 program is stopped at each point is only one of the possibilities
 afforded by stickers.  As we explained in sections \ref{stickers} and
 \ref{results}, two further ones can constitute innovative means of
@@ -883,9 +894,9 @@ visual decoration of source code with colors to indicate the most
 recent state of each sticker's execution.
 
 Its current limitations notwithstanding, the SLY/Emacs stepper
-described in this essay is the nearest thing a portable, modern,
-visual stepping facility available in the Common Lisp ecosystem.  In
-the process we have also described (1) a relatively simple (and
+described in this essay is the nearest thing an effective, portable
+and visual stepping facility available in the Common Lisp ecosystem.
+In the process we have also described (1) a relatively simple (and
 near-portable) technique for constructing a source-tracking reader in
 terms of a compliant reader implementation and (2) a reliable
 technique to carry over source-tracking information to macroexpansion.
