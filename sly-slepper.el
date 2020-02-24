@@ -49,9 +49,8 @@ in `sly-editing-mode-hook', i.e. lisp files."
       (sly-region-for-defun-at-point pos)
     (cl-loop for result in (sly-eval
                             `(slynk-slepper:slepper
-                              ,(buffer-substring-no-properties
-                                beg
-                                end)))
+                              :string
+                              ,(buffer-substring-no-properties beg end)))
              for (a . b) = (cl-getf result :source)
              unless (zerop a)
              do (save-excursion
@@ -60,19 +59,16 @@ in `sly-editing-mode-hook', i.e. lisp files."
                    (+ beg b)))))
   (message "Done"))
 
-(define-minor-mode sly-slepper-mode
-  "A minor mode active when the contrib is active."
-  nil nil nil
-  (cond (sly-slepper-mode
-         )
-        (t
-         )))
-
-(defvar sly-slepper-map
+(defvar sly-slepper-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c C-s P") 'sly-slepper)
     map)
   "A keymap accompanying `sly-slepper-mode'.")
+
+(define-minor-mode sly-slepper-mode
+  "A minor mode for using the SLY/Emacs stepper."
+  nil nil nil)
+
 
 ;;; Automatically add ourselves to `sly-contribs' when this file is loaded
 ;;;###autoload
@@ -81,4 +77,3 @@ in `sly-editing-mode-hook', i.e. lisp files."
 
 (provide 'sly-slepper)
 ;;; sly-slepper.el ends here
-
