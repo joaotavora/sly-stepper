@@ -5,42 +5,34 @@
 
 (in-package #:slynk-slepper)
 
-(defun mnesic-macroexpand-all (form ht-1 rht-1)
-  (let (stack
-        (expansion-positions (make-hash-table))
-        all-ever-expanded)
+(defun mnesic-macroexpand-all (form ht-1)
+  (let (stack (expansion-positions (make-hash-table)))
     (values
      (agnostic-lizard:walk-form
       form nil
       :on-every-form-pre
       (lambda (subform env)
         (declare (ignore env))
-        (push subform all-ever-expanded)
-        (format *trace-output* "~&~aGoing IN  ~a~%"
-                (make-string (length stack) :initial-element #\Space)
-                subform)
-        (push
-         (list
-          :original subform
-          :at (gethash subform ht-1))
-         stack)
+        (push (list :original subform
+                    :at (gethash subform ht-1))
+              stack)
         subform)
       :on-every-form
       (lambda (expansion env)
         (declare (ignore env))
-        (format *trace-output* "~&~aGoing OUT  ~a~%"
-                (make-string (1- (length stack)) :initial-element #\Space)
-                expansion)
         (destructuring-bind (&key original ((:at locations)))
             (pop stack)
-          (setf
-           (gethash expansion expansion-positions)
-           (list :original original
-                 :at locations)))
+          (setf (gethash expansion expansion-positions)
+                (list :original original
+                      :at locations)))
         expansion))
      expansion-positions)))
 
 (defvar *compound-form-location*)
+
+(defun containsp (a b)
+  "True iff A contains B."
+  (and (< (car a) (car b)) (> (cdr a) (cdr b))))
 
 (defun forms-of-interest (expanded ht-2)
   (let (interesting)
@@ -53,7 +45,6 @@
                                  (eq 'declare (first form))))
                           forms))
          (explore-definition (definition)
-           (format *trace-output* "Exploring definition ~a~%" definition)
            (destructuring-bind (name arglist &rest body)
                definition
              (declare (ignore name arglist))
@@ -194,51 +185,19 @@
       (explore expanded)
       interesting)))
 
-;; Algorithm
-
-(defun containsp (a b)
-  "True iff A contains B."
-  (and (< (car a) (car b))
-       (> (cdr a) (cdr b))))
-
+;; Entry point
 (defslyfun slepper (&optional (string "(loop for x from 1 repeat 10 collect x)"))
-  "Provide slepperish functionality for the Emacs side of SLY"
+  "Return plists representing forms of interest inside STRING."
   (with-input-from-string (stream string)
     (let* ((ht-1 (make-hash-table))
-           (rht-1 (make-hash-table :test #'equal))
            (form-tree
-             (source-tracking-reader:read-tracking-source stream nil
+             (source-tracking-reader:read-tracking-source
+              stream nil
               nil nil
               (lambda (form start end)
-                (let ((this-location (cons start end)))
-                  (setf (gethash this-location rht-1)
-                        (list :theform form
-                              :parents nil))
-                  (when (consp form)
-                    (loop for subform in form
-                          do (loop for location
-                                     in (gethash subform ht-1)
-                                   when (containsp this-location location)
-                                     do
-                                        (push form
-                                              (getf (gethash
-                                                     location rht-1) :parents)))))
-                  (push this-location (gethash form ht-1)))))))
-      (terpri)(terpri)
-      (maphash (lambda (k v)
-                 (format t "~&~s => ~s~%" k v))
-               rht-1)
-      ;; (terpri)(terpri)
-      ;; (maphash (lambda (k v)
-      ;;            (format t "~&~s => ~s~%" k v))
-      ;;          ht-1)
-      ;; (terpri)(terpri)
+                (push (cons start end) (gethash form ht-1))))))
       (multiple-value-bind (expanded ht-2)
-          (mnesic-macroexpand-all form-tree ht-1 rht-1)
-        ;; (maphash (lambda (k v)
-        ;;          (format t "~&~s => ~s~%" k v))
-        ;;          ht-2)
-        ;; (terpri)(terpri)
+          (mnesic-macroexpand-all form-tree ht-1)
         (forms-of-interest expanded ht-2)))))
 
 (provide 'slynk-slepper)
