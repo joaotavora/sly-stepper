@@ -3,10 +3,8 @@
 
 (defsystem :slynk-slepper
     :author "João Távora <https://github.com/capitaomorte>"
-  :depends-on (#:slynk
-               #:trivial-gray-streams
-               #:agnostic-lizard)
-  :description "SLEPPER support for Slynk"
+  :depends-on (#:slynk #:agnostic-lizard)
+  :description "Slynk part of the SLY/Emacs stepper tool."
   :components ((:file "source-tracking-reader")
                (:file "slynk-slepper")))
 

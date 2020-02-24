@@ -6,25 +6,25 @@
 
 ;; character counting stream
 (defclass char-counting-stream
-    (trivial-gray-streams:fundamental-character-input-stream)
+    (slynk-gray:fundamental-character-input-stream)
   ((char-count :initform 0 :reader char-count)
    (understream :initarg :understream :initform (error "required!"))))
 
-(defmethod trivial-gray-streams:stream-read-char
+(defmethod slynk-gray:stream-read-char
     ((s char-counting-stream))
   "Read one character from stream S."
   (with-slots (char-count understream) s
     (prog1 (read-char understream nil :eof)
       (incf char-count))))
 
-(defmethod trivial-gray-streams:stream-unread-char
+(defmethod slynk-gray:stream-unread-char
     ((s char-counting-stream) char)
   "Read one character from stream S."
   (with-slots (char-count understream) s
     (prog1 (unread-char char understream)
       (decf char-count))))
 
-(defmethod trivial-gray-streams:stream-read-char-no-hang
+(defmethod slynk-gray:stream-read-char-no-hang
     ((s char-counting-stream))
   "Read one character from stream S."
   (with-slots (char-count understream) s
