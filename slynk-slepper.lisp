@@ -29,7 +29,7 @@
   "True iff A contains B."
   (and (< (car a) (car b)) (> (cdr a) (cdr b))))
 
-(defun forms-of-interest (expanded ht-2)
+(defun forms-of-interest (expanded ht-2 debugp)
   (let ((interesting (make-hash-table)))
     (labels
         ((butdoc (forms)
@@ -48,9 +48,10 @@
            (mapc #'explore (butdeclares (butdoc forms))))
          (collect (form original loc)
            (setf (gethash loc interesting)
-                 (list :form form
-                       :original original
-                       :source loc)))
+                 (list* :source loc
+                        (and debugp
+                             (list :form form
+                                   :original original)))))
          (maybe-explore-atom (form safe-range)
            "Deem FORM's manifestations interesting if within SAFE-RANGE."
            (when (and (atom form)
@@ -183,8 +184,10 @@
         retval))))
 
 ;; Entry point
-(defslyfun slepper (&optional (string "(loop for x from 1 repeat 10 collect x)"))
-  "Return plists representing forms of interest inside STRING."
+(defslyfun slepper (&key (string "(loop for x from 1 repeat 10 collect x)")
+                         debugp)
+  "Return plists representing forms of interest inside STRING.
+If DEBUGP return information about the actual forms."
   (with-input-from-string (stream string)
     (let* ((ht-1 (make-hash-table))
            (form-tree
@@ -195,6 +198,6 @@
                 (push (cons start end) (gethash form ht-1))))))
       (multiple-value-bind (expanded ht-2)
           (mnesic-macroexpand-all form-tree ht-1)
-        (forms-of-interest expanded ht-2)))))
+        (forms-of-interest expanded ht-2 debugp)))))
 
 (provide 'slynk-slepper)
