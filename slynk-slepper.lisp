@@ -64,7 +64,6 @@
                      do (collect form original loc))))
          (explore (form)
            "Called when FORM is deemed interesting."
-           (format *trace-output* "Exploring ~a~%" form)
            (when (consp form)
              (let* ((entry (gethash form ht-2))
                     (loc (first (getf entry :at))))
