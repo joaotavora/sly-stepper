@@ -371,14 +371,14 @@ cases, but it doesn't seem impossible to construct a pathological case
 where the principle of functional equivalence stated above is
 violated.
 
-\subsection{Source tracking code reader}\label{st-reader}
+\subsection{Source-tracking form reader}\label{st-reader}
 
-At its simplest definition, a source-tracking reader is a variation of
-the Common Lisp \texttt{CL:READ} function that invokes a hook every
-time a sub-form is read, and proceeds to pass to this hook a measure
-of the character distance traveled so far to read it.  This enables
-problems that need both the usual results of \texttt{CL:READ} and a
-table of form-to-source-code pairings.
+At its simplest definition, a source-tracking form reader is a
+variation of the Common Lisp \texttt{CL:READ} function that invokes a
+hook every time a sub-form is read, and proceeds to pass to this hook
+a measure of the character distance traveled so far to read it.  This
+enables problems that need both the usual results of \texttt{CL:READ}
+and a table of form-to-source-code pairings.
 
 Since the Common Lisp standard doesn't specify any form of
 source-tracking reader, some preexisting alternatives were evaluated:
@@ -391,7 +391,7 @@ source-tracking reader, some preexisting alternatives were evaluated:
   distinguishing characteristic is the fact that ``concrete syntax
   trees'' are not \texttt{CONS} cells, rather CLOS objects that mimic
   the properties of such cells while also keeping ``concrete''
-  source-file information;
+  source file information;
 
   %% https://hub.darcs.net/hu.dwim/hu.dwim.reader/browse/source/reader.lisp
 \item \texttt{hu.DWIM.reader}\cite{bourguignon-reader}, by Pascal
@@ -894,13 +894,13 @@ visual decoration of source code with colors to indicate the most
 recent state of each sticker's execution.
 
 Its current limitations notwithstanding, the SLY/Emacs stepper
-described in this essay is the nearest thing an effective, portable
-and visual stepping facility available in the Common Lisp ecosystem.
-In the process we have also described (1) a relatively simple (and
-near-portable) technique for constructing a source-tracking reader in
-terms of a compliant reader implementation and (2) a reliable
-technique to carry over source-tracking information to macroexpansion.
-It is conceivable that other debugging tools could be constructed from
+described in this essay is the most effective example of a portable,
+visual stepping facility for the Common Lisp ecosystem.  In
+formulating its development we have also described (1) a simple,
+portable technique for constructing a source-tracking reader in terms
+of a compliant reader implementation and (2) a reliable technique to
+carry over source-tracking information to macroexpansion.  It is
+conceivable that other debugging tools could be constructed from
 either of these elements.
 
 \section{Acknowledgements}
