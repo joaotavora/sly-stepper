@@ -61,19 +61,19 @@
 \subsection{What is stepping}
 
 A program stepper lets users execute code, section by section, in
-steps of their own choosing.  The stepper system automatically inserts
-a number of hidden control points along the program's paths.  At each
-point, the system may wait for user instructions before and/or after
-executing the next section.  Steppers often fall within the category
-of \emph{program execution monitoring}, along with profilers, tracers
-and other debugging tools.  Stepping is the one of the most popular
-forms of debugging since it allows users to study the evolution of a
-program's state by direct inspection, as opposed to a combination of
-conjecture and experimentation.  A stepper gives users full control
-over the speed of the actual program and often even allows
-manipulations of the program state, which frequently presents a
-considerable debugging advantage over guessing the program's state or
-monitoring its outputs.
+steps of their own choosing.  A number of hidden control points are
+inserted along the program's execution paths.  At each point, the
+system may interrupt the program and wait for user instructions before
+and/or after executing the next section.  Steppers often fall within
+the category of \emph{program execution monitors}, along with
+profilers, tracers and other debugging tools.  Stepping is the one of
+the most popular forms of debugging since it allows users to study the
+evolution of a program's state by direct inspection, as opposed to a
+combination of conjecture and experimentation.  A stepper gives users
+full control over the speed of the actual program and often even
+allows manipulations of the program's state.  This frequently presents
+a debugging advantage over guessing the program's state or monitoring
+its outputs.
 
 Many programming systems, indeed all of the most popular programming
 systems provide stepper tools as a part of a debugging tool-chain,
@@ -81,9 +81,9 @@ i.e. a set of programs often developed and distributed alongside
 language compilers and interpreters.  In languages such as C, the
 prevalence of a stepping system (such as the popular \texttt{gdb}
 program) is so strong that it becomes synonymous with the term
-``debugger'', which often leads to users migrating to the Lisp family
-of languages being surprised to find debugging systems that aren't
-about stepping at all.
+``debugger''. This sometimes leads to users migrating to the Lisp
+family of languages being surprised to find debugging systems that
+aren't about stepping at all.
 
 Stepper systems usually function through text-based interfaces that
 are capable of displaying the source code of the relevant code
@@ -108,12 +108,12 @@ mouse-clicking on their manifestations in the source code.
 % https://groups.google.com/forum/#!topic/comp.lang.lisp/nj3jFxcJYM0
 
 Common Lisp programmers are so detached from the practice of stepping
-that some will simply declare that's proof that a stepper is useless.
-There is a hint of truth to this, since efforts have been directed to
-other types of debugging facilities such as powerful interactive
-program restarts and function traces.  At any rate, it seems
-undeniable that, stepper or no stepper, Common Lisp programs will be
-debugged.
+that some will simply declare that's proof that they don't need one at
+all.  There is a hint of truth to this, as Common Lisp systems have
+traditionally directed efforts to other types of debugging facilities
+such as powerful interactive program restarts and function traces.  At
+any rate, it seems undeniable that, stepper or no stepper, Common Lisp
+programs will be debugged.
 
 Nevertheless, an abundance of Common Lisp steppers have been proposed
 throughout the decades, even if few have actually enjoyed any
@@ -128,21 +128,21 @@ levels of ability.  SBCL combines its implementation of
 \texttt{CL:STEP} with the restarts system to provide a text-based
 stepper, while the LispWorks\cite{lispworks-stepper} and Allegro CL
 systems have sophisticated graphical stepping dialogues with views to
-the source code and program state .  Unfortunately, these systems are
+the source code and program state.  Unfortunately, these systems are
 unavailable to whomever wishes to try portable programs across
 different Common Lisp implementations.  Even if one switches between
 two implementations that do have steppers, the difference in
 capability and user interface is often enough to discourage either
 system's use.
 
-Interface inconsistency between implementations is not an exclusive
-problem of the stepper feature: other debugging tools such as the
+The problem of interface inconsistency across implementations is not
+exclusive to the stepper feature: other debugging tools such as the
 inspector, the debugger or the REPL suffer from it.  Thus, many Common
 Lisp programmers will use a generic text editor such as GNU
 Emacs\cite{emacs} together with the SLIME\cite{slime} extension.  This
-combination forms a fully capable, implementation-agnostic Common Lisp
-IDE that suppresses the problems described above and provides a
-consistent user interface to many debugging features.
+combination forms a capable, implementation-agnostic Common Lisp IDE
+that suppresses the problems described above and provides a consistent
+user interface to many debugging features.
 
 Regrettably, even though Emacs provides visual stepper interfaces for
 many programming languages, SLIME doesn't provide a portable stepper
@@ -152,7 +152,7 @@ tools.  Among other problems, the portability mandate of SLIME implies
 it is ultimately only allowed to invoke functionality present in all
 the Common Lisp systems it connects to.  This means that even if all
 implementations where to implement some form of \texttt{CL:STEP}, that
-alone wouldn't be powerful enough to, say communicate source location
+alone wouldn't be powerful enough to, say, communicate source location
 information to and from Emacs, annotating the program source.
 
 \subsection{A portable, visual stepper for Common
@@ -169,7 +169,7 @@ SLIME, has redesigned some of its predecessor's underpinnings to make
 this even easier.  We shall describe how ``stickers'', a feature that
 SLY has recently acquired, lets users manually instrument selected
 Common Lisp forms whose results they are interested in.  Stickers are
-already a ``poor man's stepper'', in the sense that they have the
+already a ``poor man's stepper'', in the sense that they have some
 fundamental semantics of stepping but still encumber the user with
 work than could be performed automatically.  To fill this gap, we
 shall explore methods of combining stickers with automatic code
@@ -180,7 +180,7 @@ editor, hereafter designated the \emph{SLY/Emacs stepper}.
 % Cue SLY pic
 
 The rest of this essay is structured as follows: we start by reviewing
-related work, so as to establish better context for the difficulties
+related work, to establish better context for the difficulties
 encountered and decisions made.  We'll then describe the three main
 components of the proposed SLY/Emacs stepper: (1) the interface
 between SLY/Emacs stickers and Common Lisp; (2) a source-tracking form
@@ -343,8 +343,8 @@ compilation:
 \end{verbatim}
 
 As can be seen, every time the expression above is executed, expansion
-of the wrapper macro leads to the functions \texttt{before-sticker}
-and \texttt{after-sticker} being called with the appropriate
+of the wrapper macro causes the functions \texttt{before-sticker} and
+\texttt{after-sticker} to be called with the appropriate
 \texttt{\%sticker} object.  Depending on the user's preference, these
 functions may decide to stop execution of the program (by way of
 \texttt{invoke-debugger}), or to simply record the fact that the
@@ -352,7 +352,7 @@ sticker was traversed.  The list of recordings can later be retrieved
 and replayed later inside SLY/Emacs.
 
 In our simple example, the benevolent user placed stickers on two
-expressions that are indeed execute, i.e. they are exist in places of
+expressions that are indeed executed, i.e. they exist in places of
 evaluation as defined by the syntax of the \texttt{(let ...)}  special
 form and the \texttt{(+ ...)} function form.  If a sticker had instead
 been placed on the expressions \texttt{((baz 42))} or \texttt{+} --
@@ -366,9 +366,9 @@ individual stickers, so it proceeds heuristically: it rejects the
 compilation of the whole top-level form if it determines that arming
 stickers results in an \emph{increase} to the number of compilation
 warnings.  In that case, the original form is compiled but the
-stickers \emph{fail to arm}.  This method work for a vast majority of
-cases, but it doesn't seem impossible to construct a pathological case
-where the principle of functional equivalence stated above is
+stickers \emph{fail to arm}.  This strategy works for a vast majority
+of cases, but it doesn't seem impossible to construct a pathological
+case where the principle of functional equivalence stated above is
 violated.
 
 \subsection{Source-tracking form reader}\label{st-reader}
@@ -377,7 +377,7 @@ At its simplest definition, a source-tracking form reader is a
 variation of the Common Lisp \texttt{CL:READ} function that invokes a
 hook every time a sub-form is read, and proceeds to pass to this hook
 a measure of the character distance traveled so far to read it.  This
-enables problems that need both the usual results of \texttt{CL:READ}
+enables programs that need both the usual results of \texttt{CL:READ}
 and a table of form-to-source-code pairings.
 
 Since the Common Lisp standard doesn't specify any form of
@@ -388,10 +388,10 @@ source-tracking reader, some preexisting alternatives were evaluated:
   Common Lisp reader that is highly customizable and can return
   concrete syntax trees'', is a full realization of a Common Lisp code
   reader that doesn't rely on the implementation's.  Its
-  distinguishing characteristic is the fact that ``concrete syntax
-  trees'' are not \texttt{CONS} cells, rather CLOS objects that mimic
-  the properties of such cells while also keeping ``concrete''
-  source file information;
+  distinguishing characteristic are ``concrete syntax trees'' that
+  aren't represented by \texttt{CONS} cells, rather by CLOS objects
+  that mimic the properties of such cells while also keeping
+  ``concrete'' source file information;
 
   %% https://hub.darcs.net/hu.dwim/hu.dwim.reader/browse/source/reader.lisp
 \item \texttt{hu.DWIM.reader}\cite{bourguignon-reader}, by Pascal
@@ -406,7 +406,7 @@ with minor changes).  However, since we wish to minimize our program's
 dependency chain we also searched for simpler alternatives.
 
 We reasoned that our stepper tool already expects a compliant Common
-Lisp implementation, therefore it may, by definition, also expect a
+Lisp implementation.  Therefore it may, by definition, also expect a
 compliant \texttt{CL:READ}.  So we set out to design a portable
 source-tracking reader that completely reuses the implementation's
 reader instead of replacing its implementation entirely.  To achieve
@@ -431,8 +431,8 @@ this, we settled on an arrangement of two separate techniques:
   control of each characters influence in the returned symbolic
   expression.  By setting up this function in a particular manner, the
   resulting table can be made functionally indistinguishable from the
-  original one, while still having the ability to invoke a user's
-  hook to record source positions.
+  original one, while retaining the ability to invoke a user's hook to
+  record source positions.
 \end{itemize}
 
 The inter-operation of the two techniques is summarized by the
@@ -462,9 +462,9 @@ The inter-operation of the two techniques is summarized by the
 This mechanism provides a simple, reliable\footnote{This was tested in
   SBCL, Allegro CL, CCL and ECL.  There are differences to the way
   that some implementations will construct the standard read-table
-  (for example, SBCL and Allegro CL represent constituent characters
-  differently) and \texttt{SUBSTITUTION-TABLE} has special provisions
-  for that.  The same technique should in theory work with
+  (for example, SBCL and Allegro CL represent ``constituent''
+  characters differently) and \texttt{SUBSTITUTION-TABLE} has special
+  provisions for that.  The same technique should in theory work with
   non-standard read-tables, but this has not been tested.} and
 portable\footnote{As noted, except for the use of gray streams.}  way
 to read source-code.  We can demonstrate its use on the simple
@@ -522,7 +522,7 @@ system.
 \subsubsection{Mnesic macroexpansion}
 
 To reach a state where nothing but special and function forms exist, a
-macroexpander must remove macro by expanding them.  However, in doing
+macroexpander must remove macros by expanding them.  However, in doing
 so, our program \emph{must also remember} whence each macro's
 expansion came, specifically the source position of the form in its
 pre-expansion state.  This what we mean by \emph{mnesic
@@ -549,14 +549,14 @@ By this point, the system may finally come to the realization that
 only the forms \texttt{42}, \texttt{baz}, \texttt{(plusp baz)},
 \texttt{(foo)}, \texttt{(bar)}, \texttt{(if ...)} and \texttt{(let
   ...)} are in positions of evaluation.  Regrettably, it may now have
-lost track as to \emph{where} each form lives in the source.
+lost track of \emph{where} each form lives in the source.
 
-To recover this information, it is not enough to naively consult the a
-hash-table produced in \ref{st-reader}, since some forms didn't
-exist in our original source-tracked version, and even if they did,
-the macroexpanding facilities are not generally obliged to return the
-same \texttt{CONS} objects for the forms, regardless of whether they
-expand them or not.
+To recover this information, it is not enough to naively consult the
+hash-table produced in \ref{st-reader}, since some forms didn't exist
+in our original source-tracked version.  Even if they did, the
+macroexpanding facilities are not generally obliged to return the same
+\texttt{CONS} objects for the forms, regardless of whether they expand
+them or not.
 
 In the \texttt{Eclector} library discussed in section \ref{st-reader},
 a \texttt{RECONSTRUCT} function attempts to solve this very problem by
@@ -572,12 +572,12 @@ implementations, possibly due to the aforementioned
 To overcome this obstacle we need a different approach.  Instead of
 trying to recover from a fully macroexpanded tree, we must hook into
 macroexpansion as soon as it happens.  This shall allow us to lose as
-little source-tracking information as possible.  Thus we conclude that
-a programmable, portable code-walker is necessary.  Such a system
+little source-tracking information as possible.  Thus, we conclude
+that a programmable, portable code-walker is necessary.  Such a system
 shall let us execute a hook at each macroexpansion step shortly before
 and shortly after each expansion.
 
-After surveying open-source alternatives for code-walkers, we settle
+After surveying open-source alternatives for code-walkers, we settled
 on a program called \texttt{AGNOSTIC-LIZARD}\cite{agnostic-lizard},
 which fits exactly these requirements\footnote{Furthermore,
   \texttt{AGNOSTIC-LIZARD} contains useful provisions to shield user
@@ -587,7 +587,7 @@ which fits exactly these requirements\footnote{Furthermore,
 macroexpansion, and can also be given a set of callback functions as
 hooks.
 
-Here's the snippet that illustrates our use of this walker.
+Here's the snippet that illustrates our use of this walker:
 
 \begin{verbatim}
 (defun mnesic-macroexpand-all (form subform-positions)
@@ -678,11 +678,12 @@ be reported to SLY/Emacs's sticker system for annotation.  Though its
 listing is too large to include here, its implementation is
 straightforward but for one detail described in section \ref{atoms}.
 
-As we are nearing the end of our journey and can now start putting all
+As we are nearing the end of our journey, we can now start putting all
 the pieces together. The following snippet is the final form of our
-Common Lisp stepper function, whose results can be handed to SLY/Emacs
-for instrumentation through stickers as described in section
-\ref{stickers}.
+Common Lisp function. Its results can be handed to SLY/Emacs for
+instrumentation through stickers as described in section
+\ref{stickers}.  After compilation, the instrumented code is now
+steppable.
 
 \begin{verbatim}
 (defun stepper-sticker-locations (string)
@@ -706,7 +707,7 @@ for instrumentation through stickers as described in section
 
 We have released the result of our work on the GitHub
 platform\footnote{See
-  \texttt{git@github.com:joaotavora/sly-slepper.git}.}.
+  \texttt{https://github.com/joaotavora/sly-slepper.git}.}.
 
 From an end user's perspective, to put the new SLY/Emacs stepper to
 work means pressing the key chord \texttt{C-c C-s P} (\emph{control-c,
@@ -736,7 +737,7 @@ Finally, to enable the classic stepper functionality, the user must
 explicitly select ``breaking stickers'' by affecting the value of the
 \texttt{SLYNK-STICKERS:*BREAK-ON-STICKERS*} variable.
 
-We shall see as we discuss its limitations that the resulting
+We shall see, as we discuss its limitations, that the resulting
 SLY/Emacs stepper tool is still in its infancy.  It can nevertheless
 be said to work reasonably well for a majority of normal
 circumstances, succeeding in instrumenting forms effectively and
@@ -757,7 +758,7 @@ observed with the simplest of forms:
 
 In this example, we note that the atom \texttt{X} has two different
 \emph{manifestations} in the encompassing form.  Naturally one wants
-only the latter to be annotated, and not the first.  However, this is
+only the latter to be annotated, and not the first.  However, that is
 hard to determine reliably since both are represented by the very same
 object.  This is in stark contrast to compound forms represented by
 different \texttt{CONS} cells.
@@ -765,7 +766,7 @@ different \texttt{CONS} cells.
 We can enhance the form/position pairings table used above to record
 the fact that there is more than one manifestation of an atom, but
 that's not enough to know in \texttt{MNESIC-MACROEXPAND-ALL} which of
-those is a in a position of execution.  This is because the
+those is a in a position of execution.  The reason is that the
 \texttt{AGNOSTIC-LIZARD} macroexpander will only traverse sub-forms of
 forms actually returned by a macro's expansion.  In this example, our
 hook is only called on the \texttt{(lambda (x) x)} and \texttt{x}
@@ -825,9 +826,10 @@ definition they pertain to is compiled again without stickers.
 These features don't seem hard to realize.  E.g. to enable more
 sophisticated navigation behavior behavior the \texttt{RECORD} macro
 could use a special variable to be made aware of recursive invocations
-to itself.  Thus we could keep track of stickers being executed
-\emph{inside} each other, i.e. within the dynamic scope of a
-previously active sticker annotation.
+to itself or to the currently executing stack frame.  Thus we could
+keep track of stickers being executed \emph{inside} each other,
+i.e. within the dynamic scope of a previously active sticker
+annotation.
 
 \section{Discussion}
 
@@ -835,17 +837,17 @@ Common Lisp users are concerned about features that facilitate
 day-to-day development.  \texttt{TRACE}, REPLs, \texttt{PRINT}
 statements, the interactive debuggers, profilers and stickers are all
 ways to solve certain debugging problems: some are more suitable to
-some situations than others.  Therefore, it's important to stress that
-program stepping is just another tool in the toolbox, and not way a
+some situations than others.  Therefore, it's important to note that
+program stepping is just another tool in the toolbox, not a
 panacea.
 
 By the same token, if one does implement such a tool, it should be
 done in a manner that is of actual, practical use.  This was the
 thinking behind the SLY/Emacs stepper.  We think it especially
-fortuitous that annotation-based approach and the manner of
-source-code correlation in SLY/Emacs's stickers feature doesn't make
-use of direct references to source files or file positions.  As was
-shown in \ref{stickers}, we merely keep an enumerated list of stickers
+fortunate that annotation-based approach and the manner of source-code
+correlation in SLY/Emacs's stickers feature doesn't make use of direct
+references to source files or file positions.  As was shown in
+\ref{stickers}, we merely keep an enumerated list of stickers
 identifiers synchronized between Common Lisp and SLY/Emacs, a
 mechanism that is simple but effective.  It adequately resists some
 modifications to the source of the instrumented form or its
@@ -874,9 +876,9 @@ heavy-handed solution would lock the source file read-only for the
 duration of the stepping session.  However, users are normally adverse
 to such confinements.
 
-We also think it fortuitous that stepping is implemented as an
-increment to the existing stickers functionality.  Like in
-\cite{annotation-based} we consider it an advantage of the
+We also think it fortunate that stepping is implemented as an
+increment to the existing stickers functionality.  As in
+\cite{annotation-based}, we consider it an advantage of the
 annotation-based stepping systems that users are allowed to instrument
 only the definitions they are interested in.  Indeed, it is often the
 case that stepper systems become tedious to operate because they step
@@ -905,9 +907,9 @@ either of these elements.
 
 \section{Acknowledgements}
 
-We would like to thank Luís Oliveira for early comments and advice
-when discussing the stepper feature, and Andrew Lawson for the
-encouragement to produce this work.
+We would like to thank Luís Oliveira and Michael Kirkland for early
+comments and advice when discussing the stepper feature, as well as
+Andrew Lawson for the encouragement to produce this work.
 
 %----------------------------------------------------------------------------------------
 %	REFERENCE LIST
