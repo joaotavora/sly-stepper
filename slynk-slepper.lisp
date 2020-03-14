@@ -30,6 +30,30 @@
   "True iff A contains B."
   (and (< (car a) (car b)) (> (cdr a) (cdr b))))
 
+(defun explore-function-call-atoms
+    (call call-loc ht-2 collect-fn)
+  "Explore form CALLs atoms at call-LOC"
+  (loop for form in (rest call)
+        if (consp form)
+          append (getf (gethash form ht-2) :at)
+            into unsafe-subranges
+        else if (and form
+                     (not (stringp form))
+                     (not (keywordp form)))
+               collect form into atoms
+        finally
+           (loop
+             for atom in atoms
+             for entry = (gethash atom ht-2)
+             for original = (getf entry :original)
+             for atom-locations = (getf entry :at)
+             do (loop for loc in atom-locations
+                      when (and
+                            (containsp call-loc loc)
+                            (loop for unsafe in unsafe-subranges
+                                  never (containsp unsafe loc)))
+                        do (funcall collect-fn atom original loc)))))
+
 (defun forms-of-interest (expanded ht-2 debugp)
   (let ((interesting (make-hash-table)))
     (labels
@@ -48,24 +72,14 @@
          (explore-body (forms)
            (mapc #'explore (butdeclares (butdoc forms))))
          (collect (form original loc)
+           "Deem FORM at LOC interesting for annotation."
            (setf (gethash loc interesting)
                  (list* :source loc
                         (and debugp
                              (list :form form
                                    :original original)))))
-         (maybe-explore-atom (form safe-range)
-           "Deem FORM's manifestations interesting if within SAFE-RANGE."
-           (when (and (atom form)
-                      form
-                      (not (stringp form))
-                      (not (keywordp form)))
-             (loop with entry = (gethash form ht-2)
-                   with original = (getf entry :original)
-                   for loc in (getf entry :at)
-                   when (containsp safe-range loc)
-                     do (collect form original loc))))
          (explore (form)
-           "Called when FORM is deemed interesting."
+           "Explore potentially interesting FORM, noop if atom."
            (when (consp form)
              (let* ((entry (gethash form ht-2))
                     (loc (first (getf entry :at))))
@@ -140,7 +154,7 @@
                   (explore-body body))
                  ((quote thing)
                   (declare (ignore thing)))
-               ;;; Quirks section
+                 ;; Quirks section
                  ;;
                  ;; * even though LABMDA is a macro, it expands to
                  ;; (function (lambda ..)) i.e. to itself, so we must
@@ -173,9 +187,10 @@
                  (t
                   (let ((op (first form)))
                     (assert (symbolp op) nil "Suprised by ~a" form)
-                    (loop for f in (rest form)
-                          when loc do (maybe-explore-atom f loc)
-                          do (explore f)))))))))
+                    (when loc
+                      (explore-function-call-atoms
+                       form loc ht-2 #'collect))
+                    (mapc #'explore (rest form)))))))))
       (explore expanded)
       (let (retval)
         (maphash (lambda (k v)
