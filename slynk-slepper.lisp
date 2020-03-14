@@ -6,6 +6,7 @@
 (in-package #:slynk-slepper)
 
 (defun mnesic-macroexpand-all (form ht-1)
+  "Macroexpand FORM considering positions of its subforms in HT-1."
   (let (stack (expansion-positions (make-hash-table)))
     (values
      (agnostic-lizard:walk-form
