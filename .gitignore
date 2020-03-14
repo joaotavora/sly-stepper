@@ -1,5 +1,16 @@
 *.fasl*
+*.fas
 *.elc*
 *~
 \#*\#
 .\#*
+paper/*.aux
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.bcf
+paper/*.blg
+paper/*.pdf
+paper/*.run.xml
