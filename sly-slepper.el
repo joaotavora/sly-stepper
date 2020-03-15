@@ -28,6 +28,7 @@
 ;;; Code:
 (eval-when-compile
   (add-to-list 'load-path "~/Source/Emacs/sly"))
+(require 'cl-lib)
 (require 'sly)
 
 (define-sly-contrib sly-slepper
@@ -47,17 +48,36 @@ in `sly-editing-mode-hook', i.e. lisp files."
   (interactive "d")
   (cl-destructuring-bind (beg end)
       (sly-region-for-defun-at-point pos)
-    (cl-loop for result in (sly-eval
-                            `(slynk-slepper:slepper
-                              :string
-                              ,(buffer-substring-no-properties beg end)))
-             for (a . b) = (cl-getf result :source)
-             unless (zerop a)
-             do (save-excursion
-                  (sly-slepper--sticker-maybe
-                   (+ beg a)
-                   (+ beg b)))))
-  (message "Done"))
+    (save-excursion
+      (goto-char beg)
+      (save-restriction
+        (narrow-to-region beg end)
+        (cl-loop
+         with function-name =
+         (and (search-forward-regexp "^[\s\t]*(def[^\s\t]*[\s\t]+"
+                                     (line-end-position) t)
+              (thing-at-point 'symbol))
+         for result in (sly-eval
+                        `(slynk-slepper:slepper
+                          :string
+                          ,(buffer-substring-no-properties beg end)))
+         for (a . b) = (cl-getf result :source)
+         for from = (+ beg a) for to = (+ beg b)
+         unless (zerop a)
+         do (sly-slepper--sticker-maybe from to)
+         and minimize from into min
+         and maximize to into max
+         finally
+         (let ((top-level-sticker
+                (and min max
+                     (car
+                      (sly-stickers--stickers-exactly-at min max)))))
+           (if (null top-level-sticker)
+               (sly-message "Something odd instrumented for stepping")
+             (sly-message "%s now instrumented for stepping."
+                          (if function-name (upcase function-name)
+                            "Unknown top-level form"))
+             (overlay-put top-level-sticker 'sly-stickers--top-level t))))))))
 
 (defvar sly-slepper-mode-map
   (let ((map (make-sparse-keymap)))
