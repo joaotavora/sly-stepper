@@ -5,11 +5,28 @@
 
 (in-package #:slynk-slepper)
 
+(eval-when (:load-toplevel :execute)
+  (format *trace-output* "~&Attempting ~a preload~%" :agnostic-lizard)
+  (ignore-errors
+   (unless (funcall (read-from-string "ql:quickload")
+                    :agnostic-lizard)
+     (funcall (read-from-string "asdf:load-system")
+              :agnostic-lizard))))
+
 (defun mnesic-macroexpand-all (form ht-1)
   "Macroexpand FORM considering positions of its subforms in HT-1."
+  (assert
+   (find-package :agnostic-lizard)
+   nil
+   "Didn't find essential ~a package, needed for ~a to work,  ~
+    You should load it into your system and retry this assertion.  ~
+    If you do so via Quicklisp, it'll probably just work next time."
+   :agnostic-lizard
+   :sly-slepper)
   (let (stack (expansion-positions (make-hash-table)))
     (values
-     (agnostic-lizard:walk-form
+     (funcall
+      (read-from-string "agnostic-lizard:walk-form")
       form nil
       :on-every-form-pre
       (lambda (subform env)
