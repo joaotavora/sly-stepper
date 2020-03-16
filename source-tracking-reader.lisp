@@ -88,8 +88,9 @@
             *readtable*
             (lambda (shadowed-entry)
               (let ((start (1- (char-count ccs)))
-                    (result (funcall shadowed-entry))
+                    (results (multiple-value-list (funcall shadowed-entry)))
                     (end (char-count ccs)))
-                (prog1 result
-                  (funcall observer result start end)))))))
+                (multiple-value-prog1 (apply #'values results)
+                  (when results
+                    (funcall observer (car results) start end))))))))
     (read ccs eof-error-p eof-value recursive-p)))
