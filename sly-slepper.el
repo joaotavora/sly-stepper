@@ -26,8 +26,13 @@
 ;; `sly-slepper` is SLY contrib. See README.md
 ;;
 ;;; Code:
-(eval-when-compile
-  (add-to-list 'load-path "~/Source/Emacs/sly"))
+
+;; Uncomment this and set to your paths to appease Flymake's elisp
+;; backend:
+;;
+;; (eval-when-compile
+;;   (add-to-list 'load-path "~/Source/Emacs/sly")
+;;   (add-to-list 'load-path "~/Source/Emacs/sly/contrib"))
 (require 'cl-lib)
 (require 'sly)
 (require 'sly-stickers)
