@@ -30,6 +30,7 @@
   (add-to-list 'load-path "~/Source/Emacs/sly"))
 (require 'cl-lib)
 (require 'sly)
+(require 'sly-stickers)
 
 (define-sly-contrib sly-slepper
   "Define the `sly-slepper' contrib.
@@ -39,24 +40,37 @@ in `sly-editing-mode-hook', i.e. lisp files."
   (:on-load (add-hook 'sly-editing-mode-hook 'sly-slepper-mode))
   (:on-unload (remove-hook 'sly-editing-mode-hook 'sly-slepper-mode)))
 
-(defun sly-slepper--sticker-maybe (from to)
-  (unless (sly-stickers--stickers-exactly-at from to)
-    (sly-stickers--sticker from to)))
+(defun sly-slepper--stepper-sticker-p (sticker)
+  (overlay-get sticker 'sly-slepper--stepper-sticker-p))
+
+(defun sly-slepper--stepper-sticker (from to function-name)
+  (let ((sticker (sly-stickers--sticker from to)))
+    (overlay-put sticker 'sly-slepper--stepper-sticker-p t)
+    (overlay-put sticker 'sly-slepper--function-name function-name)))
 
 (defun sly-slepper (pos)
-  "Slepp defun at point POS.  POS defaults to curren point."
+  "Instrument nearest function at POS for stepping.
+POS defaults to current point."
   (interactive "d")
   (cl-destructuring-bind (beg end)
       (sly-region-for-defun-at-point pos)
     (save-excursion
-      (goto-char beg)
+      (let* ((all-stickers (sly-stickers--stickers-between beg end)))
+        (when (and (cl-remove-if #'sly-slepper--stepper-sticker-p all-stickers)
+                   (not
+                    (y-or-n-p
+                   "[sly] Some non-stepper stickers in region.  Delete them?")))
+          (user-error "[sly] Aborted."))
+        (mapc #'sly-stickers--delete all-stickers))
       (save-restriction
         (narrow-to-region beg end)
+        (goto-char (point-min))
         (cl-loop
          with function-name =
          (and (search-forward-regexp "^[\s\t]*(def[^\s\t]*[\s\t]+"
                                      (line-end-position) t)
-              (thing-at-point 'symbol))
+              (substring-no-properties
+               (thing-at-point 'symbol)))
          for result in (sly-eval
                         `(slynk-slepper:slepper
                           :string
@@ -64,7 +78,7 @@ in `sly-editing-mode-hook', i.e. lisp files."
          for (a . b) = (cl-getf result :source)
          for from = (+ beg a) for to = (+ beg b)
          unless (zerop a)
-         do (sly-slepper--sticker-maybe from to)
+         do (sly-slepper--stepper-sticker from to function-name)
          and minimize from into min
          and maximize to into max
          finally
