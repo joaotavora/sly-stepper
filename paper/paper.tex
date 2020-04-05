@@ -62,18 +62,18 @@
 
 A program stepper lets users execute code, section by section, in
 steps of their own choosing.  A number of hidden control points are
-inserted along the program's execution paths.  At each point, the
+inserted along the execution paths of the program.  At each point, the
 system may interrupt the program and wait for user instructions before
 and/or after executing the next section.  Steppers often fall within
 the category of \emph{program execution monitors}, along with
 profilers, tracers and other debugging tools.  Stepping is the one of
 the most popular forms of debugging since it allows users to study the
-evolution of a program's state by direct inspection, as opposed to a
-combination of conjecture and experimentation.  A stepper gives users
+evolution of the state of a program by direct inspection, as opposed
+to combining conjecture and experimentation.  A stepper gives users
 full control over the speed of the actual program and often even
-allows manipulations of the program's state.  This frequently presents
-a debugging advantage over guessing the program's state or monitoring
-its outputs.
+allows manipulations of that state.  This frequently presents a
+debugging advantage over guessing a programs' state or monitoring its
+outputs.
 
 Many programming systems, indeed all of the most popular programming
 systems provide stepper tools as a part of a debugging tool-chain,
@@ -87,18 +87,18 @@ aren't about stepping at all.
 
 Stepper systems usually function through text-based interfaces that
 are capable of displaying the source code of the relevant code
-sections.  Nevertheless, many users of steppers tool prefer to use
+sections.  Nevertheless, many users of stepper tools prefer to use
 them through the more sophisticated user interfaces of editor programs
 and integrated development environments (IDEs).  We shall call these
-\emph{visual} steppers\footnote{After the nomenclature used in
+tools \emph{visual} steppers\footnote{After the nomenclature used in
   \cite{annotation-based}}: special-purpose programs running inside
 the IDE communicate with the stepper tool by means of a protocol and
-visually annotate the program's source text with the results of the
+visually annotate the source text of a program with the results of the
 stepping session.  The expression about to be executed may e.g. be
 marked with a red dot or highlighted in a special color.  Furthermore,
 a modern user's expectations of a stepper system might include the
 ability to add break points; to ``step over'' an expression; to ``step
-into'' a call to a function defined elsewhere in the srouce code; to
+into'' a call to a function defined elsewhere in the source code; to
 ``step out of'' the current call; to ``continue'' to a certain point,
 and to inspect the values of local and global variables by
 mouse-clicking on their manifestations in the source code.
@@ -109,11 +109,11 @@ mouse-clicking on their manifestations in the source code.
 
 Common Lisp programmers are so detached from the practice of stepping
 that some will simply declare that's proof that they don't need one at
-all.  There is a hint of truth to this, as Common Lisp systems have
-traditionally directed efforts to other types of debugging facilities
-such as powerful interactive program restarts and function traces.  At
-any rate, it seems undeniable that, stepper or no stepper, Common Lisp
-programs will be debugged.
+all.  There is a hint of truth to this declaration, as Common Lisp
+systems have traditionally directed efforts to other types of
+debugging facilities such as powerful interactive program restarts and
+function traces.  At any rate, it seems undeniable that, stepper or no
+stepper, Common Lisp programs will be debugged.
 
 Nevertheless, an abundance of Common Lisp steppers have been proposed
 throughout the decades, even if few have actually enjoyed any
@@ -132,8 +132,8 @@ the source code and program state.  Unfortunately, these systems are
 unavailable to whomever wishes to try portable programs across
 different Common Lisp implementations.  Even if one switches between
 two implementations that do have steppers, the difference in
-capability and user interface is often enough to discourage either
-system's use.
+capability and user interface is often enough to discourage the use of
+either system.
 
 The problem of interface inconsistency across implementations is not
 exclusive to the stepper feature: other debugging tools such as the
@@ -150,10 +150,11 @@ interface.  We believe this to be due to the fact that the technical
 challenges to be surmounted are greater than for other debugging
 tools.  Among other problems, the portability mandate of SLIME implies
 it is ultimately only allowed to invoke functionality present in all
-the Common Lisp systems it connects to.  This means that even if all
-implementations where to implement some form of \texttt{CL:STEP}, that
-alone wouldn't be powerful enough to, say, communicate source location
-information to and from Emacs, annotating the program source.
+the Common Lisp systems it connects to.  This mandate implies that
+even if all implementations where to implement some form of
+\texttt{CL:STEP}, that alone wouldn't be powerful enough to, say,
+communicate source location information to and from Emacs, annotating
+the program source.
 
 \subsection{A portable, visual stepper for Common
   Lisp}
@@ -165,17 +166,18 @@ attractive target for such a tool, given its relevance among Common
 Lisp users and the flexibility of Emacs's Elisp language.
 
 In fact, the SLY Common Lisp IDE\cite{sly}, a derivative program of
-SLIME, has redesigned some of its predecessor's underpinnings to make
-this even easier.  We shall describe how ``stickers'', a feature that
-SLY has recently acquired, lets users manually instrument selected
-Common Lisp forms whose results they are interested in.  Stickers are
-already a ``poor man's stepper'', in the sense that they have some
-fundamental semantics of stepping but still encumber the user with
-work than could be performed automatically.  To fill this gap, we
-shall explore methods of combining stickers with automatic code
-analysis.  We shall then be able to present an innovative stepper tool
-for the Common Lisp language based on the SLY extension to the Emacs
-editor, hereafter designated the \emph{SLY/Emacs stepper}.
+SLIME, has redesigned some of the underpinnings of its predecessor to
+make the development of new extensions easier.  We shall describe how
+``stickers'', a feature that SLY has recently acquired, lets users
+manually instrument selected Common Lisp forms whose results they are
+interested in.  Stickers are already a ``poor man's stepper'', in the
+sense that they have some fundamental semantics of stepping but still
+encumber the user with work than could be performed automatically.  To
+fill this gap, we shall explore methods of combining stickers with
+automatic code analysis.  We shall then be able to present an
+innovative stepper tool for the Common Lisp language based on the SLY
+extension to the Emacs editor, hereafter designated the
+\emph{SLY/Emacs stepper}.
 
 % Cue SLY pic
 
@@ -193,7 +195,7 @@ the stepper tool's interface, its limitations and future work.
 ``Stepping is an old idea.''  So go the opening words of this
 section's namesake in the article ``Annotation-Based Program
 Stepping'', written by MIT's G. Parker in 1987\cite{annotation-based}.
-In this article, the author surveys the 1970 decade's efforts to
+In this article, the author surveys the efforts of the 1970 decade to
 develop various kinds of stepping tools in the MACLISP environment.
 Likewise, we shall proceed to evaluate a small sample of Common Lisp
 stepper systems, focusing on the ones that are portable, visual and
@@ -327,7 +329,7 @@ definition is presented below in much simplified fashion:
          (after-sticker %sticker %retval %condition)))))
 \end{verbatim}
 
-E.g. if the user marks the forms \texttt{(foo (bar))} and
+E.g., if the user marks the forms \texttt{(foo (bar))} and
 \texttt{(bar)} inside the following expression:
 
 \begin{verbatim}
@@ -387,7 +389,7 @@ source-tracking reader, some preexisting alternatives were evaluated:
 \item \texttt{Eclector}\cite{eclector}, a self-described ``portable
   Common Lisp reader that is highly customizable and can return
   concrete syntax trees'', is a full realization of a Common Lisp code
-  reader that doesn't rely on the implementation's.  Its
+  reader that doesn't rely on any preexisting reader.  Its
   distinguishing characteristic are ``concrete syntax trees'' that
   aren't represented by \texttt{CONS} cells, rather by CLOS objects
   that mimic the properties of such cells while also keeping
@@ -427,12 +429,12 @@ this, we settled on an arrangement of two separate techniques:
 \item A \emph{substitute read-table}, achieved by rebinding the
   variable \texttt{*READTABLE*}.  This table \emph{shadows} each of
   the entries of the current read-table (using
-  \texttt{GET/SET-MACRO-CHARACTER}) with a function that allows full
-  control of each characters influence in the returned symbolic
+  \texttt{GET/SET-MACRO-CHARACTER}) with a function that fully
+  controls the influence of each character over the returned symbolic
   expression.  By setting up this function in a particular manner, the
-  resulting table can be made functionally indistinguishable from the
-  original one, while retaining the ability to invoke a user's hook to
-  record source positions.
+  resulting table remains functionally indistinguishable from the
+  original one, while gaining the ability to invoke a hook that
+  records source positions.
 \end{itemize}
 
 The inter-operation of the two techniques is summarized by the
@@ -525,11 +527,12 @@ system.
 \subsubsection{Mnesic macroexpansion}
 
 To reach a state where nothing but special and function forms exist, a
-macroexpander must remove macros by expanding them.  However, in doing
-so, our program \emph{must also remember} whence each macro's
+macroexpander must remove macro calls by expanding them.  However, in
+doing so, our program \emph{must also remember} whence each macro's
 expansion came, specifically the source position of the form in its
-pre-expansion state.  This what we mean by \emph{mnesic
-  macroexpansion}, the opposite of \emph{amnesic macroexpansion}
+pre-expansion state.  This behavior is what we refer to as
+\emph{mnesic macroexpansion}, the opposite of \emph{amnesic
+  macroexpansion}.
 
 Take the form:
 
@@ -826,7 +829,7 @@ number.  Furthermore, there is as of yet no notion of a stepping
 armed (even if the corresponding source code is deleted) until the
 definition they pertain to is compiled again without stickers.
 
-These features don't seem hard to realize.  E.g. to enable more
+These features don't seem hard to realize.  E.g., to enable more
 sophisticated navigation behavior behavior the \texttt{RECORD} macro
 could use a special variable to be made aware of recursive invocations
 to itself or to the currently executing stack frame.  Thus we could
@@ -837,12 +840,11 @@ annotation.
 \section{Discussion}
 
 Common Lisp users are concerned about features that facilitate
-day-to-day development.  \texttt{TRACE}, REPLs, \texttt{PRINT}
-statements, the interactive debuggers, profilers and stickers are all
-ways to solve certain debugging problems: some are more suitable to
-some situations than others.  Therefore, it's important to note that
-program stepping is just another tool in the toolbox, not a
-panacea.
+day-to-day development.  \texttt{TRACE}, REPLs, \texttt{PRINT} forms,
+the interactive debuggers, profilers and stickers are all ways to
+solve certain debugging problems: some are more suitable to some
+situations than others.  Therefore, it's important to note that
+program stepping is just another tool in the toolbox, not a panacea.
 
 By the same token, if one does implement such a tool, it should be
 done in a manner that is of actual, practical use.  This was the
@@ -863,7 +865,7 @@ advantages of annotation-based steppers were already hinted at back in
 1989 by the proponents of evaluation-based steppers\cite[l.41,
 l.42]{evaluation-based}.
 
-By contrast, an hypothetical evaluation-based visual stepper (such an
+By contrast, a hypothetical evaluation-based visual stepper (such an
 as enhanced version of \cite{bourguignon}) would find it difficult to
 maintain this advantage since the source-code correlation is achieved
 at evaluation-time and is harder to mutate effectively afterwards.
