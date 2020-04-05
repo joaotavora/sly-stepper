@@ -837,6 +837,31 @@ keep track of stickers being executed \emph{inside} each other,
 i.e. within the dynamic scope of a previously active sticker
 annotation.
 
+\subsection{Portability}
+
+The system as been described as ``portable'' or ``near-portable''.
+Indeed, if a completely new conforming implementation of Common Lisp
+were to spring into being, support for our stepper system would have
+to deal with three potential sources of non-portability: (1) support
+of the \texttt{AGNOSTIC-LIZARD} code-walking program, (2) differing
+representations of constituent characters in readtables (for the
+source-tracking reader described in section \ref{st-reader}), and (3)
+support for ``gray streams''.  We defer the discussion of (1) to
+\cite{agnostic-lizard}, noting that that system is built with
+portability as its foremost requisite.  The ``shielding'' it offers is
+useful e.g. in dealing with SBCL's implementation of
+\texttt{CL:DEFMETHOD}, which itself produces a complicated
+transformation of its body.  In (2), we note that the adjustments to
+the read-table were needed only for SBCL's implementation, who doesn't
+use a the macro-character function for constituents.  If the
+hypothetical new implementation \emph{also} did so, it is plausible
+that the current code would also support it.  Otherwise, if it were to
+use a function (as the remaining implementations), it would probably
+require no extra work as well.  Lastly, for (3), we think it
+reasonable to expect support for ``gray streams'' in new
+implementations, since it is a widely adopted extension, and required
+by SLY/Emacs to begin with.
+
 \section{Discussion}
 
 Common Lisp users are concerned about features that facilitate
@@ -914,7 +939,8 @@ either of these elements.
 
 We would like to thank Luís Oliveira and Michael Kirkland for early
 comments and advice when discussing the stepper feature, as well as
-Andrew Lawson for the encouragement to produce this work.
+Andrew Lawson for the encouragement to produce this work.  We also
+offer thanks to the reviewers who provided very insightful comments.
 
 %----------------------------------------------------------------------------------------
 %	REFERENCE LIST
