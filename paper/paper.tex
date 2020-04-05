@@ -914,15 +914,27 @@ debugging: the \emph{post-mortem} replay of sticker recordings and the
 visual decoration of source code with colors to indicate the most
 recent state of each sticker's execution.
 
+In formulating the development of the SLY/Emacs stepper, we have also
+described (1) a simple, portable technique for constructing a
+source-tracking reader in terms of a compliant reader implementation
+and (2) a reliable technique to carry over source-tracking information
+to macroexpansion.  It is conceivable that other debugging tools could
+be constructed from either of these elements.
+
 Its current limitations notwithstanding, the SLY/Emacs stepper
-described in this essay is the most effective example of a portable,
-visual stepping facility for the Common Lisp ecosystem.  In
-formulating its development we have also described (1) a simple,
-portable technique for constructing a source-tracking reader in terms
-of a compliant reader implementation and (2) a reliable technique to
-carry over source-tracking information to macroexpansion.  It is
-conceivable that other debugging tools could be constructed from
-either of these elements.
+described in this essay is an effective example of a portable, visual
+stepping facility for the Common Lisp ecosystem.  To the best of our
+knowledge, it is indeed the \emph{only} system that combines these
+characteristics.  As such, there is little to compare it against,
+except maybe for the aforementioned \texttt{edebug.el}\cite{edebug}
+program for the Emacs Lisp language, an annotation-based stepper that
+handles macros via user-supplied syntax declarations.  We believe that
+the underpinnings of the SLY/Emacs stepper -- \emph{stickers} and
+mnesic macroexpansion -- are solid.  We envision enhancements to its
+user interface, certainly by incorporating ideas from the interfaces
+of non-portable visual Common Lisp steppers, or steppers for other
+programming languages.
+
 
 \section{Acknowledgements}
 
