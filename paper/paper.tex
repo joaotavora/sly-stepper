@@ -577,10 +577,10 @@ on a program called \texttt{AGNOSTIC-LIZARD}\cite{agnostic-lizard},
 which fits exactly these requirements\footnote{Furthermore,
   \texttt{AGNOSTIC-LIZARD} contains useful provisions to shield user
   code from certain nonconformities in the macroexpansions of certain
-  built-in macros, such as \texttt{DEFUN}.}.  Its main primitive,
-\texttt{AGNOSTIC-LIZARD:WALK-FORM}, produces the desired full
-macroexpansion, and can also be given a set of callback functions as
-hooks.
+  built-in macros, such as \texttt{DEFUN}.}.
+\texttt{AGNOSTIC-LIZARD:WALK-FORM}, its main primitive, produces the
+desired full macroexpansion and can be given a set of callback
+functions as hooks.
 
 Here's the snippet that illustrates our use of this walker:
 
@@ -790,7 +790,7 @@ already shown to be reliable in the sense that if it needs to fail
 early.  Thus the potential to mislead users to wrong debugging
 conclusions is minimized.
 
-A better approach to solve this problem could revisit
+A different approach to solve this problem could revisit
 \texttt{Eclector}'s ``concrete syntax trees'' or a variation thereof
 and use a portable, programmable macroexpander that also understands
 these types of trees, where different manifestations of the same
