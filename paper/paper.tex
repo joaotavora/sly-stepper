@@ -862,21 +862,21 @@ program stepping is just another tool in the toolbox, not a panacea.
 
 By the same token, if one does implement such a tool, it should be
 done in a manner that is of actual, practical use.  This was the
-thinking behind the SLY/Emacs stepper.  We think it especially
-fortunate that annotation-based approach and the manner of source-code
-correlation in SLY/Emacs's stickers feature doesn't make use of direct
-references to source files or file positions.  As was shown in
+reasoning behind the SLY/Emacs stepper.  We think it especially
+fortunate that the annotation-based approach and the manner of
+source-code correlation in SLY/Emacs's stickers don't make use of
+direct references to source files or file positions.  As was shown in
 \ref{stickers}, we merely keep an enumerated list of stickers
 identifiers synchronized between Common Lisp and SLY/Emacs, a
 mechanism that is simple but effective.  It adequately resists some
 modifications to the source of the instrumented form or its
 whereabouts, such as moving it around in the source file, or even
 adding white-space and comments inside it.  This detail is crucial in
-making stickers and stepping actually usable for day-to-day
-programming, since the user isn't dragged away from his editor or
-forced to a special confinement while stepping.  We note that these
-advantages of annotation-based steppers were already hinted at back in
-1989 by the proponents of evaluation-based steppers\cite[l.41,
+making stickers and stepping usable for day-to-day programming, since
+the user isn't dragged away from his editor or forced to a special
+confinement while stepping.  We note that these advantages of
+annotation-based steppers were already hinted at back in 1989 by the
+proponents of evaluation-based steppers\cite[l.41,
 l.42]{evaluation-based}.
 
 By contrast, a hypothetical evaluation-based visual stepper (such an
@@ -885,34 +885,31 @@ maintain this advantage since the source-code correlation is achieved
 at evaluation-time and is harder to mutate effectively afterwards.
 Perhaps this fact can explain why the non-portable visual steppers of
 the Allegro CL and LispWorks implementations don't work directly with
-the source-editing facilities present in these
-IDEs\footnote{LispWorks's stepper manual specifically mentions this
-  fact in \cite{lispworks-stepper}.}.  A possible solution would be to
-represent source-code correlation in terms of sub-expression paths in
-the form tree instead of character positions, but it would still be
-hard to resist deletions and insertions at top level.  A more
-heavy-handed solution would lock the source file read-only for the
-duration of the stepping session.  However, users are normally adverse
-to such confinements.
+the source-editing facilities present in these IDEs.  A possible
+solution would be to represent source-code correlation in terms of
+sub-expression paths in the form tree instead of character positions,
+but it would still be hard to resist deletions and insertions at top
+level.  A more heavy-handed solution would lock the source file
+read-only for the duration of the stepping session.  However, users
+are normally adverse to such confinements.
 
 We also think it fortunate that stepping is implemented as an
 increment to the existing stickers functionality.  As in
 \cite{annotation-based}, we consider it an advantage of the
-annotation-based stepping systems that users are allowed to instrument
-only the definitions they are interested in.  Indeed, it is often the
-case that stepper systems become tedious to operate because they step
-on \emph{too much}.  Our system has an additional selectivity
-advantage: since the annotations are stickers, users can manually
-adjust the automatically placed stickers, removing the ones they are
-not interested in, or adding others.
+annotation-based systems that users are allowed to instrument only the
+definitions they are interested in.  Indeed, it is often the case that
+steppers become tedious to operate because they step on \emph{too
+  much}.  Yet, in our system, users can manually adjust the
+automatically placed stickers, removing the ones they are not
+interested in, or adding others.
 
 It may also be noted that the usual stepping paradigm where the
 program is stopped at each point is only one of the possibilities
 afforded by stickers.  As we explained in sections \ref{stickers} and
-\ref{results}, two further ones can constitute innovative means of
+\ref{results}, two further ones constitute innovative means of
 debugging: the \emph{post-mortem} replay of sticker recordings and the
-visual decoration of source code with colors to indicate the most
-recent state of each sticker's execution.
+visual decoration of source code with colors indicating the state of
+the most recent execution of each sticker.
 
 In formulating the development of the SLY/Emacs stepper, we have also
 described (1) a simple, portable technique for constructing a
@@ -921,19 +918,21 @@ and (2) a reliable technique to carry over source-tracking information
 to macroexpansion.  It is conceivable that other debugging tools could
 be constructed from either of these elements.
 
-Its current limitations notwithstanding, the SLY/Emacs stepper
-described in this essay is an effective example of a portable, visual
-stepping facility for the Common Lisp ecosystem.  To the best of our
-knowledge, it is indeed the \emph{only} system that combines these
-characteristics.  As such, there is little to compare it against,
-except maybe for the aforementioned \texttt{edebug.el}\cite{edebug}
-program for the Emacs Lisp language, an annotation-based stepper that
-handles macros via user-supplied syntax declarations.  We believe that
-the underpinnings of the SLY/Emacs stepper -- \emph{stickers} and
+The SLY/Emacs stepper described in this essay is an effective example
+of a portable, visual stepping facility for the Common Lisp ecosystem.
+To the best of our knowledge, it is indeed the \emph{only} system
+combining these characteristics.  As such, there is little to compare
+it against.  The closest match could well lie outside of Common Lisp,
+in the aforementioned \texttt{edebug.el}\cite{edebug} stepper, an
+annotation-based approach that is equally well integrated with the
+source code editor.  That stepper has a better interface, but requires
+custom declarations for stepping into macro expansions, something the
+SLY/Emacs stepper handles automatically.  Its current limitations
+notwithstanding, we believe that the underpinnings of the SLY/Emacs
+stepper -- \emph{stickers}, a simple source-tracking reader, and
 mnesic macroexpansion -- are solid.  We envision enhancements to its
-user interface, certainly by incorporating ideas from the interfaces
-of non-portable visual Common Lisp steppers, or steppers for other
-programming languages.
+interface, perhaps by incorporating ideas of non-portable visual
+steppers, or steppers for other programming languages.
 
 
 \section{Acknowledgements}
