@@ -842,15 +842,14 @@ portability as its foremost requisite.  The ``shielding'' it offers is
 useful e.g. in dealing with SBCL's implementation of
 \texttt{CL:DEFMETHOD}, which itself produces a complicated
 transformation of its body.  In (2), we note that the adjustments to
-the read-table were needed only for SBCL's implementation, who doesn't
-use a the macro-character function for constituents.  If the
+the read-table were needed only for SBCL's implementation, which
+doesn't use a macro-character function for constituents.  If the
 hypothetical new implementation \emph{also} did so, it is plausible
-that the current code would also support it.  Otherwise, if it were to
-use a function (as the remaining implementations), it would probably
-require no extra work as well.  Lastly, for (3), we think it
-reasonable to expect support for ``gray streams'' in new
-implementations, since it is a widely adopted extension, and required
-by SLY/Emacs to begin with.
+that the current code would support it.  Otherwise, it would behave as
+the remaining implementations, also requiring no extra work.  Lastly,
+for (3), we think it reasonable to expect support for ``gray streams''
+in new implementations, since it is a widely adopted extension, and
+required by SLY/Emacs to begin with.
 
 \section{Discussion}
 
@@ -926,13 +925,13 @@ combining these characteristics.  As such, there is little to compare
 it against.  The closest match could well lie outside of Common Lisp,
 in the aforementioned \texttt{edebug.el}\cite{edebug} stepper, an
 annotation-based approach that is equally well integrated with the
-source code editor.  That stepper has a better interface, but requires
-custom declarations for stepping into macro expansions, something the
-SLY/Emacs stepper handles automatically.  Its current limitations
-notwithstanding, we believe that the underpinnings of the SLY/Emacs
-stepper -- \emph{stickers}, a simple source-tracking reader, and
-mnesic macroexpansion -- are solid.  We envision enhancements to its
-interface, perhaps by incorporating ideas of non-portable visual
+source code editor.  That stepper has a more developed interface, but
+requires custom declarations for stepping into macro expansions,
+something the SLY/Emacs stepper handles automatically.  Its current
+limitations notwithstanding, we believe that the underpinnings of the
+SLY/Emacs stepper -- \emph{stickers}, a simple source-tracking reader,
+and mnesic macroexpansion -- are solid.  We envision enhancements to
+its interface, perhaps by incorporating ideas of non-portable visual
 steppers, or steppers for other programming languages.
 
 
