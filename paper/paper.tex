@@ -1,4 +1,5 @@
-\documentclass[sigconf]{acmart}
+\documentclass[format=sigconf]{acmart}
+\bibliographystyle{plainnat}
 
 \usepackage{blindtext} % Package to generate dummy text throughout this template 
 
@@ -10,15 +11,15 @@
 
 \author{João Távora} \affiliation{Ravenpack}
 \email{joaotavora@gmail.com}
-\acmConference{2020 European Lisp Symposium}{April 27th - April 28th 2020}{Zurich, Switzerland}
-
+\acmConference[ELS’20]{the 13th European Lisp Symposium}{April 27--28 2020}{%
+Zürich, Switzerland}
+\acmDOI{10.5281/zenodo.3742759}
 
 \setcopyright{rightsretained} % if you give the rights to ACM
 % \acmDOI{...} % DOI - Insert your DOI below...
 % \acmISBN{...} % ISBN - Insert your conference/workshop's ISBN below...
 \acmYear{2020} % Insert Publication year
 \copyrightyear{2020} % Insert Copyright year (typically the same as above)
-\acmConference[ELS 2020]{2020 European Lisp Symposium}{April 27th - April 28th 2020}{Zurich, Switzerland}
 
 \begin{document}
 \title{A portable, annotation-based, visual stepper for Common Lisp}
