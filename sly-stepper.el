@@ -1,7 +1,7 @@
-;;; sly-slepper.el --- A template SLY contrib  -*- lexical-binding: t; -*-
+;;; sly-stepper.el --- A template SLY contrib  -*- lexical-binding: t; -*-
 ;;
 ;; Version: 0.1
-;; URL: https://github.com/capitaomorte/sly-slepper
+;; URL: https://github.com/capitaomorte/sly-stepper
 ;; Keywords: languages, lisp, sly
 ;; Package-Requires: ((sly "1.0.0-beta2"))
 ;; Author: João Távora <joaotavora@gmail.com>
@@ -23,7 +23,7 @@
 ;;
 ;;; Commentary:
 ;;
-;; `sly-slepper` is SLY contrib. See README.md
+;; `sly-stepper` is SLY contrib. See README.md
 ;;
 ;;; Code:
 
@@ -37,23 +37,23 @@
 (require 'sly)
 (require 'sly-stickers)
 
-(define-sly-contrib sly-slepper
-  "Define the `sly-slepper' contrib.
-Depends on the `slynk-slepper' ASDF system Insinuates itself
+(define-sly-contrib sly-stepper
+  "Define the `sly-stepper' contrib.
+Depends on the `slynk-stepper' ASDF system Insinuates itself
 in `sly-editing-mode-hook', i.e. lisp files."
-  (:slynk-dependencies slynk-slepper)
-  (:on-load (add-hook 'sly-editing-mode-hook 'sly-slepper-mode))
-  (:on-unload (remove-hook 'sly-editing-mode-hook 'sly-slepper-mode)))
+  (:slynk-dependencies slynk-stepper)
+  (:on-load (add-hook 'sly-editing-mode-hook 'sly-stepper-mode))
+  (:on-unload (remove-hook 'sly-editing-mode-hook 'sly-stepper-mode)))
 
-(defun sly-slepper--stepper-sticker-p (sticker)
-  (overlay-get sticker 'sly-slepper--stepper-sticker-p))
+(defun sly-stepper--stepper-sticker-p (sticker)
+  (overlay-get sticker 'sly-stepper--stepper-sticker-p))
 
-(defun sly-slepper--stepper-sticker (from to function-name)
+(defun sly-stepper--stepper-sticker (from to function-name)
   (let ((sticker (sly-stickers--sticker from to)))
-    (overlay-put sticker 'sly-slepper--stepper-sticker-p t)
-    (overlay-put sticker 'sly-slepper--function-name function-name)))
+    (overlay-put sticker 'sly-stepper--stepper-sticker-p t)
+    (overlay-put sticker 'sly-stepper--function-name function-name)))
 
-(defun sly-slepper (pos)
+(defun sly-stepper (pos)
   "Instrument nearest function at POS for stepping.
 POS defaults to current point."
   (interactive "d")
@@ -61,7 +61,7 @@ POS defaults to current point."
       (sly-region-for-defun-at-point pos)
     (save-excursion
       (let* ((all-stickers (sly-stickers--stickers-between beg end)))
-        (when (and (cl-remove-if #'sly-slepper--stepper-sticker-p all-stickers)
+        (when (and (cl-remove-if #'sly-stepper--stepper-sticker-p all-stickers)
                    (not
                     (y-or-n-p
                    "[sly] Some non-stepper stickers in region.  Delete them?")))
@@ -77,13 +77,13 @@ POS defaults to current point."
               (substring-no-properties
                (thing-at-point 'symbol)))
          for result in (sly-eval
-                        `(slynk-slepper:slepper
+                        `(slynk-stepper:stepper
                           :string
                           ,(buffer-substring-no-properties beg end)))
          for (a . b) = (cl-getf result :source)
          for from = (+ beg a) for to = (+ beg b)
          unless (zerop a)
-         do (sly-slepper--stepper-sticker from to function-name)
+         do (sly-stepper--stepper-sticker from to function-name)
          and minimize from into min
          and maximize to into max
          finally
@@ -98,13 +98,13 @@ POS defaults to current point."
                             "Unknown top-level form"))
              (overlay-put top-level-sticker 'sly-stickers--top-level t))))))))
 
-(defvar sly-slepper-mode-map
+(defvar sly-stepper-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-s P") 'sly-slepper)
+    (define-key map (kbd "C-c C-s P") 'sly-stepper)
     map)
-  "A keymap accompanying `sly-slepper-mode'.")
+  "A keymap accompanying `sly-stepper-mode'.")
 
-(define-minor-mode sly-slepper-mode
+(define-minor-mode sly-stepper-mode
   "A minor mode for using the SLY/Emacs stepper."
   nil nil nil)
 
@@ -112,7 +112,7 @@ POS defaults to current point."
 ;;; Automatically add ourselves to `sly-contribs' when this file is loaded
 ;;;###autoload
 (with-eval-after-load 'sly
-  (add-to-list 'sly-contribs 'sly-slepper 'append))
+  (add-to-list 'sly-contribs 'sly-stepper 'append))
 
-(provide 'sly-slepper)
-;;; sly-slepper.el ends here
+(provide 'sly-stepper)
+;;; sly-stepper.el ends here

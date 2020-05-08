@@ -1,8 +1,8 @@
-(defpackage :slepper-tests (:use :cl))
-(in-package :slepper-tests)
+(defpackage :stepper-tests (:use :cl))
+(in-package :stepper-tests)
 
 
-(in-package :slynk-slepper)
+(in-package :slynk-stepper)
 
 
 (defun bla ()
@@ -83,7 +83,7 @@
 
 (lambda (x) x)
 
-(slepper
+(stepper
  "")
 
 (defun bla ()
@@ -93,7 +93,7 @@
 
 
 ;; => ((:FORM (- X) :SOURCE (24 . 29)) (:FORM (MINUSP X) :SOURCE (12 . 22)))
-(slepper
+(stepper
  "(if (tricky (minusp x)) (- x) x)")
 ;; => ((:FORM (- X) :SOURCE (24 . 29)))
 

@@ -1,9 +1,9 @@
-(defpackage #:slynk-slepper
+(defpackage #:slynk-stepper
   (:use :cl #:slynk-api)
   (:export
-   #:slepper))
+   #:stepper))
 
-(in-package #:slynk-slepper)
+(in-package #:slynk-stepper)
 
 (eval-when (:load-toplevel :execute)
   (format *trace-output* "~&Attempting ~a preload~%" :agnostic-lizard)
@@ -22,7 +22,7 @@
     You should load it into your system and retry this assertion.  ~
     If you do so via Quicklisp, it'll probably just work next time."
    :agnostic-lizard
-   :sly-slepper)
+   :sly-stepper)
   (let (stack (expansion-positions (make-hash-table)))
     (values
      (funcall
@@ -217,7 +217,7 @@
         retval))))
 
 ;; Entry point
-(defslyfun slepper (&key (string "(loop for x from 1 repeat 10 collect x)")
+(defslyfun stepper (&key (string "(loop for x from 1 repeat 10 collect x)")
                          debugp)
   "Return plists representing forms of interest inside STRING.
 If DEBUGP return information about the actual forms."
@@ -233,4 +233,4 @@ If DEBUGP return information about the actual forms."
           (mnesic-macroexpand-all form-tree ht-1)
         (forms-of-interest expanded ht-2 debugp)))))
 
-(provide 'slynk-slepper)
+(provide 'slynk-stepper)
