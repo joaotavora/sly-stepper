@@ -23,6 +23,8 @@
 
 (if (fboundp 'register-definition-prefixes) (register-definition-prefixes "sly-slepper-tests" '("sly-slepper-basic-test")))
 
+(provide 'sly-slepper-autoloads)
+
 ;;;***
 
 ;; Local Variables:
