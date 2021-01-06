@@ -7,9 +7,11 @@
 
 (eval-when (:load-toplevel :execute)
   (format *trace-output* "~&Attempting ~a preload~%" :agnostic-lizard)
-  (ignore-errors
-   (unless (funcall (read-from-string "ql:quickload")
-                    :agnostic-lizard)
+  (or
+   (ignore-errors (funcall (read-from-string "ql:quickload")
+                           :agnostic-lizard))
+   (progn
+     (require :asdf)
      (funcall (read-from-string "asdf:load-system")
               :agnostic-lizard))))
 
