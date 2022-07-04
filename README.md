@@ -1,6 +1,3 @@
-[![MELPA](http://melpa.org/packages/sly-stepper-badge.svg)](http://melpa.org/#/sly-stepper)
-[![Build Status](https://travis-ci.org/capitaomorte/sly-stepper.svg?branch=master)](https://travis-ci.org/capitaomorte/sly-stepper)
-
 # A portable Common Lisp stepper interface
 
 `sly-stepper` is contrib for [SLY, a Common Lisp IDE][sly].
@@ -10,8 +7,7 @@ Lisp Symposium 2020 Zurich][paper].
 
 Need a decent README, but here's how to get started.
 
-First, install in any of the two ways described below (normal or MELPA
-install).
+First, install it as described below.
 
 Once that's done, and your SLY is connected, you can `M-x sly-stepper`
 on any old function to *instrument it for stepping*.  
@@ -52,14 +48,11 @@ automatically.  This means the following lines in your `~/.emacs` or
 In case you already have SLY loaded and running, you might have to
 `M-x sly-setup` and `M-x sly-enable-contrib` to enable it.
 
-## Install from MELPA
+## MELPA install
 
-Perform the [usual MELPA setup](http://melpa.org) and then select
-`sly-stepper` for installation from the package menu or from `M-x
-package-install`.
-
-Once it's done, `M-x sly` should now bring up a stepper-enabled
-SLY.
+MELPA installs are not available right now.  If you're really
+interested in making this a MELPA package, it's not hard, but needs a
+bit of work.  Let me know in the issue tracker.
 
 [sly]: https://github.com/capitaomorte/sly
 [stickers]: https://joaotavora.github.io/sly/#Stickers
