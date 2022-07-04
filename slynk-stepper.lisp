@@ -223,6 +223,9 @@
                          debugp)
   "Return plists representing forms of interest inside STRING.
 If DEBUGP return information about the actual forms."
+  #+armedbear
+  (error "ABCL is unsupported")
+  #-armedbear
   (with-input-from-string (stream string)
     (let* ((ht-1 (make-hash-table))
            (form-tree
