@@ -8,7 +8,8 @@
                ;; #:agnostic-lizard
                )
   :description "Slynk part of the SLY/Emacs stepper tool."
-  :components ((:file "source-tracking-reader")
+  :components (#-armedbear
+               (:file "source-tracking-reader")
                (:file "slynk-stepper")))
 
 ;; Local Variables:
