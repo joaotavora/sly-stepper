@@ -6,31 +6,37 @@
 `sly-stepper` is contrib for [SLY, a Common Lisp IDE][sly].
 
 It's the program that accompanies the [paper accepted to the European
-Lisp Symposium 2020 Zurich](https://zenodo.org/record/3742759).
+Lisp Symposium 2020 Zurich][paper].
 
-It's in need of a good README description, but here's how to get
-started.  In any of the two ways described below.
+Need a decent README, but here's how to get started.
 
-Once that's done, and your SLY is connected you can `M-x sly-stepper`
-on a given function to instrument it for stepping, i.e. setting
-stickers on every evaluated form of the function.  Then proceed as
-normal as you do for [normal SLY sticker
-usage](https://joaotavora.github.io/sly/#Stickers).
+First, install in any of the two ways described below (normal or MELPA
+install).
 
-The command `sly-stepper` is also bound to `C-c C-s P`, for
-convenience.  If you make a mistake and set stickers you didn't mean
-to, you can clear stickers for the whole defun as you normally do with
-`C-u C-c C-s C-s`.
+Once that's done, and your SLY is connected, you can `M-x sly-stepper`
+on any old function to *instrument it for stepping*.  
+
+![screenshot](./images/screenshot.png)
+
+Intrumenting means setting [_stickers_][stickers] on every evaluated
+form of the function.  Read about [SLY sticker usage][stickers] or
+read the [paper][paper] on various ways in which you can step through
+a function.
+
+For convenience, the `M-x sly-stepper` is also bound to `C-c C-s P`.
+If you make a mistake and set stickers you didn't mean to, you can
+clear stickers for the whole defun do with `C-u C-c C-s C-s`, as
+usual.
 
 ## Normal install
 
 Since this is an external contrib with both Elisp and Lisp parts,
-merely loading the Elisp will have little effect. The contrib has to
-be registered in SLY's `sly-contribs` variable for SLY to take care of
-loading the Lisp side on demand.
+merely loading the Elisp into Emacs will have little effect. The
+contrib has to be registered in SLY's `sly-contribs` variable for SLY
+to take care of loading the Lisp side on demand.
 
-For convenience, the `sly-stepper-autoloads` file takes care
-of this automatically. So the following setup in your `~/.emacs` or
+For convenience, the `sly-stepper-autoloads` file takes care of this
+automatically.  This means the following lines in your `~/.emacs` or
 `~/.emacs.d/init/el` init file should be enough:
 
 ```elisp
@@ -55,5 +61,6 @@ package-install`.
 Once it's done, `M-x sly` should now bring up a stepper-enabled
 SLY.
 
-
 [sly]: https://github.com/capitaomorte/sly
+[stickers]: https://joaotavora.github.io/sly/#Stickers
+[paper]: https://zenodo.org/record/3742759
